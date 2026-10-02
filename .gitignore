@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Frontend build output
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+
+# Rust / Tauri build output
+src-tauri/target/
+src-tauri/gen/
+src-tauri/WixTools/
+
+# Installers and bundles
+*.msi
+*.exe
+*.AppImage
+*.deb
+*.rpm
+*.dmg
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local test vaults (never commit real assets)
+test-vault/
+sample-assets/
