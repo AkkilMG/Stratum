@@ -3396,6 +3396,7 @@ dependencies = [
  "tauri-plugin-dialog",
  "ureq",
  "walkdir",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]

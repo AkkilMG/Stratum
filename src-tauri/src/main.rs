@@ -1,11 +1,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
-use notify::{RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{RecursiveMode, Watcher};
 use rusqlite::{params, Connection};
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::{collections::HashSet, fs, io::Cursor, path::{Path, PathBuf}, process::Command, sync::{mpsc, Mutex}, thread, time::{Duration, UNIX_EPOCH}};
-use tauri::{AppHandle, Emitter, State};
+use std::{collections::{BTreeMap, HashSet}, fs, io::Cursor, path::{Path, PathBuf}, process::{Command, Stdio}, sync::{atomic::{AtomicU64, Ordering}, mpsc, Mutex, OnceLock}, thread, time::{Duration, Instant, UNIX_EPOCH}};
+use tauri::{AppHandle, Emitter, Manager, State};
 use walkdir::WalkDir;
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
@@ -13,29 +13,113 @@ use std::os::windows::process::CommandExt;
 type R<T> = Result<T, String>;
 fn e<E: ToString>(x: E) -> String { x.to_string() }
 const OLLAMA: &str = "http://localhost:11434";
+static CACHE: OnceLock<PathBuf> = OnceLock::new();
+static AUTHOR: Mutex<String> = Mutex::new(String::new());
+static GEN: AtomicU64 = AtomicU64::new(0);
+static GIT_LOCK: Mutex<()> = Mutex::new(());
+
+/// Index + thumbnails live on THIS machine (never on a NAS: SQLite over SMB/NFS can corrupt).
+fn cache(root: &Path) -> PathBuf {
+    let mut h: u64 = 0xcbf29ce484222325;
+    for b in root.to_string_lossy().bytes() { h ^= b as u64; h = h.wrapping_mul(0x100000001b3); }
+    CACHE.get().cloned().unwrap_or_else(|| std::env::temp_dir().join("stratum")).join(format!("{h:016x}"))
+}
+fn author() -> String {
+    let a = AUTHOR.lock().map(|g| (*g).clone()).unwrap_or_default();
+    if a.is_empty() { "Stratum".into() } else { a }
+}
+#[cfg(windows)]
+fn is_network(p: &Path) -> bool {
+    use std::os::windows::ffi::OsStrExt;
+    let s = p.to_string_lossy().to_string();
+    if s.starts_with("\\\\?\\UNC") || (s.starts_with("\\\\") && !s.starts_with("\\\\?\\")) { return true; }
+    let t = s.trim_start_matches("\\\\?\\");
+    if t.len() < 2 || t.as_bytes()[1] != b':' { return false; }
+    let root = format!("{}\\", &t[..2]);
+    let w: Vec<u16> = std::ffi::OsStr::new(&root).encode_wide().chain(Some(0)).collect();
+    unsafe { windows_sys::Win32::Storage::FileSystem::GetDriveTypeW(w.as_ptr()) == 4 }
+}
+#[cfg(not(windows))]
+fn is_network(p: &Path) -> bool {
+    let m = fs::read_to_string("/proc/mounts").unwrap_or_default();
+    let p = p.to_string_lossy().to_string();
+    let mut best = (String::new(), false);
+    for l in m.lines() {
+        let f: Vec<&str> = l.split_whitespace().collect();
+        if f.len() > 2 && p.starts_with(f[1]) && f[1].len() >= best.0.len() {
+            best = (f[1].to_string(), ["nfs", "nfs4", "cifs", "smb3", "smbfs", "fuse.sshfs", "9p"].contains(&f[2]));
+        }
+    }
+    best.1
+}
+/// Tags are shared with teammates through a small file that travels with the repository.
+fn read_tags(root: &Path) -> BTreeMap<String, String> {
+    fs::read_to_string(root.join(".stratum-tags.json")).ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or_default()
+}
+fn export_tags(root: &Path) {
+    if let Ok(c) = db(root) {
+        if let Ok(mut s) = c.prepare("SELECT path,tags FROM assets WHERE tags!=''") {
+            let m: BTreeMap<String, String> = s.query_map([], |r| Ok((r.get(0)?, r.get(1)?))).map(|x| x.flatten().collect()).unwrap_or_default();
+            let _ = fs::write(root.join(".stratum-tags.json"), serde_json::to_string_pretty(&m).unwrap_or_default());
+        }
+    }
+}
+/// git with a hard timeout, no credential prompts: a dead NAS or VPN can never hang the app.
+fn git_t(root: &Path, args: &[&str], secs: u64) -> (bool, String) {
+    let mut c = Command::new("git");
+    c.current_dir(root).args(["-c", "safe.directory=*"]).args(args)
+        .env("GIT_TERMINAL_PROMPT", "0").env("GIT_SSH_COMMAND", "ssh -o BatchMode=yes -o ConnectTimeout=10")
+        .stdout(Stdio::piped()).stderr(Stdio::piped());
+    #[cfg(windows)]
+    c.creation_flags(0x08000000);
+    let mut ch = match c.spawn() { Ok(x) => x, Err(x) => return (false, x.to_string()) };
+    let start = Instant::now();
+    loop {
+        match ch.try_wait() {
+            Ok(Some(_)) => break,
+            Ok(None) => {
+                if start.elapsed().as_secs() > secs { let _ = ch.kill(); return (false, "Timed out. The remote didn't respond.".into()); }
+                thread::sleep(Duration::from_millis(100));
+            }
+            Err(x) => return (false, x.to_string()),
+        }
+    }
+    match ch.wait_with_output() {
+        Ok(o) => (o.status.success(), format!("{}{}", String::from_utf8_lossy(&o.stdout), String::from_utf8_lossy(&o.stderr)).trim().to_string()),
+        Err(x) => (false, x.to_string()),
+    }
+}
+fn emit_sync(app: &AppHandle, res: &R<String>) {
+    let at = std::time::SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
+    let msg = match res { Ok(m) => m.clone(), Err(m) => m.clone() };
+    let _ = app.emit("sync-state", json!({"ok": res.is_ok(), "msg": msg, "at": at}));
+}
+
 
 #[derive(Default)]
-struct Vault { root: Mutex<Option<PathBuf>>, watcher: Mutex<Option<RecommendedWatcher>> }
+struct Vault { root: Mutex<Option<PathBuf>>, watcher: Mutex<Option<Box<dyn Watcher + Send>>> }
 fn root(s: &State<'_, Vault>) -> R<PathBuf> { s.root.lock().unwrap().clone().ok_or_else(|| "No vault open".to_string()) }
 
 #[derive(Serialize)]
 struct Asset { path: String, name: String, kind: String, size: i64, mtime: i64, tags: String, tagged: bool }
 #[derive(Serialize)]
-struct Stats { assets: i64, bytes: i64, tagged: i64, commits: i64, by_kind: Vec<(String, i64)>, ollama: bool, lfs: bool }
+struct Stats { assets: i64, bytes: i64, tagged: i64, commits: i64, by_kind: Vec<(String, i64)>, ollama: bool, lfs: bool, remote: String, ahead: i64, network: bool }
 #[derive(Serialize)]
 struct Commit { hash: String, author: String, when: String, msg: String }
 
 // ---------- helpers ----------
 fn git(root: &Path, args: &[&str]) -> Vec<u8> {
     let mut c = Command::new("git");
-    c.current_dir(root).args(args);
+    c.current_dir(root).args(["-c", "safe.directory=*"]).args(args).env("GIT_TERMINAL_PROMPT", "0");
     #[cfg(windows)]
     c.creation_flags(0x08000000);
     c.output().map(|o| o.stdout).unwrap_or_default()
 }
 fn db(root: &Path) -> R<Connection> {
-    fs::create_dir_all(root.join(".stratum/thumbs")).map_err(e)?;
-    let c = Connection::open(root.join(".stratum/index.db")).map_err(e)?;
+    fs::create_dir_all(cache(root).join("thumbs")).map_err(e)?;
+    let c = Connection::open(cache(root).join("index.db")).map_err(e)?;
+    c.busy_timeout(Duration::from_secs(10)).map_err(e)?;
+    c.execute_batch("PRAGMA journal_mode=WAL;PRAGMA synchronous=NORMAL;").map_err(e)?;
     c.execute_batch("CREATE TABLE IF NOT EXISTS assets(path TEXT PRIMARY KEY,name TEXT,kind TEXT,size INTEGER,mtime INTEGER,tags TEXT DEFAULT '',embedding TEXT,tagged INTEGER DEFAULT 0);").map_err(e)?;
     Ok(c)
 }
@@ -49,7 +133,7 @@ fn kind(p: &Path) -> &'static str {
         _ => "Other",
     }
 }
-fn tpath(root: &Path, rel: &str) -> PathBuf { root.join(".stratum/thumbs").join(rel.replace('/', "__") + ".jpg") }
+fn tpath(root: &Path, rel: &str) -> PathBuf { cache(root).join("thumbs").join(rel.replace('/', "__") + ".jpg") }
 fn data_uri(b: &[u8]) -> String { format!("data:image/jpeg;base64,{}", B64.encode(b)) }
 fn cosine(a: &[f32], b: &[f32]) -> f32 {
     if a.len() != b.len() || a.is_empty() { return 0.0; }
@@ -63,10 +147,22 @@ fn row_asset(x: &rusqlite::Row) -> rusqlite::Result<Asset> {
 const COLS: &str = "path,name,kind,size,mtime,COALESCE(tags,''),tagged";
 
 // ---------- git / index ----------
-fn init_git(root: &Path) {
-    if !root.join(".git").exists() { git(root, &["init"]); }
-    if !root.join(".gitignore").exists() { let _ = fs::write(root.join(".gitignore"), ".stratum/\n*~\n*.tmp\n*.swp\nThumbs.db\n.DS_Store\n"); }
-    if !git(root, &["lfs", "version"]).is_empty() && !root.join(".gitattributes").exists() {
+fn init_git(root: &Path, lfs: bool) {
+    if !root.join(".git").exists() {
+        if is_network(root) {
+            // History stays on this PC; only the files live on the share.
+            let g = cache(root).join("gitdir");
+            let _ = fs::create_dir_all(&g);
+            git(root, &["init", "-b", "main", &format!("--separate-git-dir={}", g.display())]);
+        } else {
+            git(root, &["init", "-b", "main"]);
+        }
+    }
+    for (k, v) in [("core.autocrlf", "false"), ("core.longpaths", "true"), ("core.bigFileThreshold", "20m"), ("core.compression", "0")] {
+        git(root, &["config", k, v]);
+    }
+    if !root.join(".gitignore").exists() { let _ = fs::write(root.join(".gitignore"), "*~\n*.tmp\n*.swp\nThumbs.db\n.DS_Store\n"); }
+    if lfs && !git(root, &["lfs", "version"]).is_empty() && !root.join(".gitattributes").exists() {
         let mut s = String::new();
         for x in ["psd", "ai", "fig", "png", "jpg", "jpeg", "tga", "fbx", "blend", "glb", "wav"] {
             s += &format!("*.{x} filter=lfs diff=lfs merge=lfs -text\n");
@@ -75,9 +171,13 @@ fn init_git(root: &Path) {
         git(root, &["lfs", "install", "--local"]);
     }
 }
-fn commit(root: &Path, msg: &str) {
+fn commit_raw(root: &Path, msg: &str) {
     git(root, &["add", "-A"]);
-    git(root, &["-c", "user.name=Stratum", "-c", "user.email=stratum@local", "commit", "-m", msg]);
+    git(root, &["-c", &format!("user.name={}", author()), "-c", "user.email=stratum@local", "commit", "-m", msg]);
+}
+fn commit(root: &Path, msg: &str) {
+    let _g = GIT_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+    commit_raw(root, msg);
 }
 fn thumb_make(root: &Path, rel: &str) {
     let l = rel.to_lowercase();
@@ -90,13 +190,14 @@ fn thumb_make(root: &Path, rel: &str) {
 fn scan(root: &Path) -> R<()> {
     let c = db(root)?;
     let mut seen = HashSet::new();
+    let meta = read_tags(root);
     let walker = WalkDir::new(root).into_iter().filter_entry(|d| {
         let n = d.file_name().to_string_lossy();
         n != ".git" && n != ".stratum" && !ignored(&n)
     });
     for ent in walker.flatten().filter(|d| d.file_type().is_file()) {
         let rel = ent.path().strip_prefix(root).map_err(e)?.to_string_lossy().replace('\\', "/");
-        if rel == ".gitignore" || rel == ".gitattributes" { continue; }
+        if rel == ".gitignore" || rel == ".gitattributes" || rel == ".stratum-tags.json" { continue; }
         let md = ent.metadata().map_err(e)?;
         let mt = md.modified().ok().and_then(|t| t.duration_since(UNIX_EPOCH).ok()).map(|d| d.as_secs() as i64).unwrap_or(0);
         let old: Option<i64> = c.query_row("SELECT mtime FROM assets WHERE path=?1", [&rel], |r| r.get(0)).ok();
@@ -104,13 +205,14 @@ fn scan(root: &Path) -> R<()> {
         if old == Some(mt) { continue; }
         let k = kind(ent.path());
         c.execute(
-            "INSERT INTO assets(path,name,kind,size,mtime) VALUES(?1,?2,?3,?4,?5) ON CONFLICT(path) DO UPDATE SET size=?4,mtime=?5,tagged=0",
-            params![rel, ent.file_name().to_string_lossy().to_string(), k, md.len() as i64, mt],
+            "INSERT INTO assets(path,name,kind,size,mtime,tags) VALUES(?1,?2,?3,?4,?5,?6) ON CONFLICT(path) DO UPDATE SET size=?4,mtime=?5,tagged=0,tags=CASE WHEN COALESCE(tags,'')='' THEN ?6 ELSE tags END",
+            params![rel, ent.file_name().to_string_lossy().to_string(), k, md.len() as i64, mt, meta.get(&rel).cloned().unwrap_or_default()],
         ).map_err(e)?;
         if matches!(k, "Image" | "Vector") || rel.to_lowercase().ends_with(".psd") { thumb_make(root, &rel); }
     }
     let all: Vec<String> = c.prepare("SELECT path FROM assets").map_err(e)?.query_map([], |r| r.get(0)).map_err(e)?.flatten().collect();
     for p in all { if !seen.contains(&p) { c.execute("DELETE FROM assets WHERE path=?1", [&p]).map_err(e)?; } }
+    for (p, t) in &meta { let _ = c.execute("UPDATE assets SET tags=?1,tagged=0 WHERE path=?2 AND COALESCE(tags,'')!=?1", params![t, p]); }
     Ok(())
 }
 
@@ -130,12 +232,12 @@ fn vision_tags(abs: &Path) -> Option<String> {
 }
 fn tag_pending(app: &AppHandle, root: &Path) {
     let Ok(c) = db(root) else { return };
-    let rows: Vec<(String, String, String)> = match c.prepare("SELECT path,name,kind FROM assets WHERE tagged=0") {
+    let rows: Vec<(String, String, String)> = match c.prepare("SELECT path,name,COALESCE(tags,'') FROM assets WHERE tagged=0") {
         Ok(mut s) => s.query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?))).map(|m| m.flatten().collect()).unwrap_or_default(),
         Err(_) => return,
     };
-    for (p, n, _k) in rows {
-        let tags = if tpath(root, &p).exists() {
+    for (p, n, k) in rows {
+        let tags = if !k.is_empty() { k.clone() } else if tpath(root, &p).exists() {
             match vision_tags(&tpath(root, &p)) { Some(t) => t, None => return } // Ollama offline: retry on next change
         } else {
             Path::new(&n).file_stem().map(|s| s.to_string_lossy().replace(['_', '-'], ", ")).unwrap_or_default()
@@ -144,30 +246,57 @@ fn tag_pending(app: &AppHandle, root: &Path) {
         let _ = c.execute("UPDATE assets SET tags=?1,embedding=?2,tagged=1 WHERE path=?3", params![tags, serde_json::to_string(&v).unwrap(), p]);
         let _ = app.emit("vault-changed", ());
     }
+    export_tags(root);
 }
 
 // ---------- commands ----------
 #[tauri::command]
-async fn open_vault(path: String, app: AppHandle, st: State<'_, Vault>) -> R<()> {
+async fn open_vault(path: String, lfs: bool, remote: Option<String>, app: AppHandle, st: State<'_, Vault>) -> R<()> {
     let r = PathBuf::from(&path);
-    if !r.is_dir() { return Err("Folder not found".into()); }
+    if !r.is_dir() { return Err("This folder isn't available. If it lives on a NAS, check the connection and retry.".into()); }
+    let probe = r.join(".stratum-write-test");
+    fs::write(&probe, b"ok").map_err(|_| "Stratum can't write to this folder. Check its permissions.".to_string())?;
+    let _ = fs::remove_file(&probe);
     db(&r)?;
+    init_git(&r, lfs);
+    if let Some(u) = remote.filter(|u| !u.trim().is_empty()) {
+        let has = git_out(&r, &["remote", "get-url", "origin"]).0;
+        let _ = git_out(&r, &["remote", if has { "set-url" } else { "add" }, "origin", u.trim()]);
+    }
+    let generation = GEN.fetch_add(1, Ordering::SeqCst) + 1;
     *st.root.lock().unwrap() = Some(r.clone());
     let (tx, rx) = mpsc::channel::<()>();
-    let mut w = notify::recommended_watcher(move |ev: notify::Result<notify::Event>| {
+    let handler = move |ev: notify::Result<notify::Event>| {
         if let Ok(ev) = ev {
-            if ev.paths.iter().any(|p| !p.components().any(|c| c.as_os_str() == ".git" || c.as_os_str() == ".stratum") && !ignored(&p.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default())) { let _ = tx.send(()); }
+            if ev.paths.iter().any(|p| !p.components().any(|c| c.as_os_str() == ".git") && !ignored(&p.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default())) {
+                let _ = tx.send(());
+            }
         }
-    }).map_err(e)?;
+    };
+    // Network shares don't deliver change events reliably, so poll them.
+    let mut w: Box<dyn Watcher + Send> = if is_network(&r) {
+        Box::new(notify::PollWatcher::new(handler, notify::Config::default().with_poll_interval(Duration::from_secs(10))).map_err(e)?)
+    } else {
+        Box::new(notify::recommended_watcher(handler).map_err(e)?)
+    };
     w.watch(&r, RecursiveMode::Recursive).map_err(e)?;
-    *st.watcher.lock().unwrap() = Some(w); // replaces (and stops) any previous watcher
+    *st.watcher.lock().unwrap() = Some(w);
+    let (a, r1) = (app.clone(), r.clone());
+    thread::spawn(move || loop {
+        thread::sleep(Duration::from_secs(120));
+        if GEN.load(Ordering::SeqCst) != generation { break; }
+        if git_out(&r1, &["remote"]).1.is_empty() { continue; }
+        let res = sync_inner(&r1);
+        if res.is_ok() { let _ = scan(&r1); let _ = a.emit("vault-changed", ()); }
+        emit_sync(&a, &res);
+    });
     thread::spawn(move || {
         let _ = app.emit("busy", true);
-        init_git(&r);
         let _ = scan(&r);
         commit(&r, "Index vault");
         let _ = app.emit("vault-changed", ());
         let _ = app.emit("busy", false);
+        if !git_out(&r, &["remote"]).1.is_empty() { let res = sync_inner(&r); emit_sync(&app, &res); }
         tag_pending(&app, &r);
         while rx.recv().is_ok() {
             thread::sleep(Duration::from_millis(1500));
@@ -193,7 +322,10 @@ async fn stats(st: State<'_, Vault>) -> R<Stats> {
     let commits = String::from_utf8_lossy(&git(&r, &["rev-list", "--count", "HEAD"])).trim().parse().unwrap_or(0);
     let ollama = ureq::get(&format!("{OLLAMA}/api/tags")).timeout(Duration::from_millis(800)).call().is_ok();
     let lfs = !git(&r, &["lfs", "version"]).is_empty();
-    Ok(Stats { assets, bytes, tagged, commits, by_kind, ollama, lfs })
+    let remote = String::from_utf8_lossy(&git(&r, &["remote", "get-url", "origin"])).trim().to_string();
+    let br = String::from_utf8_lossy(&git(&r, &["rev-parse", "--abbrev-ref", "HEAD"])).trim().to_string();
+    let ahead = if remote.is_empty() { 0 } else { String::from_utf8_lossy(&git(&r, &["rev-list", "--count", &format!("origin/{br}..HEAD")])).trim().parse().unwrap_or(commits) };
+    Ok(Stats { assets, bytes, tagged, commits, by_kind, ollama, lfs, remote, ahead, network: is_network(&r) })
 }
 #[tauri::command]
 async fn list_assets(st: State<'_, Vault>) -> R<Vec<Asset>> {
@@ -256,7 +388,7 @@ fn ignored(n: &str) -> bool {
 }
 fn git_out(root: &Path, args: &[&str]) -> (bool, String) {
     let mut c = Command::new("git");
-    c.current_dir(root).args(args);
+    c.current_dir(root).args(["-c", "safe.directory=*"]).args(args).env("GIT_TERMINAL_PROMPT", "0");
     #[cfg(windows)]
     c.creation_flags(0x08000000);
     match c.output() {
@@ -306,10 +438,12 @@ fn parse_commits(out: &[u8]) -> Vec<Commit> {
 
 #[tauri::command]
 async fn set_tags(path: String, tags: String, st: State<'_, Vault>) -> R<()> {
-    let c = db(&root(&st)?)?;
+    let r = root(&st)?;
+    let c = db(&r)?;
     let name: String = c.query_row("SELECT name FROM assets WHERE path=?1", [&path], |r| r.get(0)).map_err(e)?;
     let emb = embed(&format!("{name} {tags}")).map(|v| serde_json::to_string(&v).unwrap());
     c.execute("UPDATE assets SET tags=?1,embedding=COALESCE(?2,embedding),tagged=1 WHERE path=?3", params![tags, emb, path]).map_err(e)?;
+    export_tags(&r);
     Ok(())
 }
 #[tauri::command]
@@ -352,28 +486,98 @@ async fn set_remote(url: String, st: State<'_, Vault>) -> R<()> {
     let (ok, m) = git_out(&r, &["remote", if has { "set-url" } else { "add" }, "origin", &url]);
     if ok { Ok(()) } else { Err(m) }
 }
+fn sync_inner(r: &Path) -> R<String> {
+    let _g = GIT_LOCK.lock().unwrap_or_else(|p| p.into_inner());
+    let (has, u) = git_out(r, &["remote", "get-url", "origin"]);
+    if !has { return Err("No NAS or server is connected yet.".into()); }
+    if !u.contains("://") && !u.contains('@') && !Path::new(&u).exists() {
+        return Err("The NAS isn't reachable. Your work is safe on this PC and will sync when it's back.".into());
+    }
+    if !git_out(r, &["rev-parse", "HEAD"]).0 { return Err("Nothing to sync yet.".into()); }
+    commit_raw(r, "Save before sync");
+    let b = git_out(r, &["rev-parse", "--abbrev-ref", "HEAD"]).1;
+    let (ok, m) = git_t(r, &["fetch", "origin"], 90);
+    if !ok { return Err(format!("Remote not reachable: {m}")); }
+    let rb = format!("origin/{b}");
+    let mut saved = 0;
+    if git_out(r, &["rev-parse", "--verify", &rb]).0 {
+        let base = git_out(r, &["merge-base", "HEAD", &rb]).1;
+        if !base.is_empty() {
+            let names = |x: &str, y: &str| -> HashSet<String> { git_out(r, &["diff", "--name-only", x, y]).1.lines().map(|s| s.to_string()).collect() };
+            let both: Vec<String> = names(&base, "HEAD").intersection(&names(&base, &rb)).cloned().collect();
+            for p in both.iter().filter(|p| *p != ".stratum-tags.json") {
+                // Edited on both sides: keep yours, and save the teammate's version next to it. Nothing is lost.
+                let bytes = git(r, &["cat-file", "--filters", &format!("{rb}:{p}")]);
+                if bytes.is_empty() { continue; }
+                let pp = Path::new(p);
+                let stem = pp.file_stem().map(|s| s.to_string_lossy().to_string()).unwrap_or_default();
+                let ext = pp.extension().map(|s| format!(".{}", s.to_string_lossy())).unwrap_or_default();
+                if fs::write(r.join(pp.with_file_name(format!("{stem} (conflict from teammate){ext}"))), bytes).is_ok() { saved += 1; }
+            }
+        }
+        let id = format!("user.name={}", author());
+        let (ok, m) = git_out(r, &["-c", &id, "-c", "user.email=stratum@local", "merge", "--no-edit", "--allow-unrelated-histories", "-X", "ours", &rb]);
+        if !ok { git(r, &["merge", "--abort"]); return Err(format!("Couldn't merge. Your local files were kept. {m}")); }
+    }
+    let (ok, m) = git_t(r, &["push", "-u", "origin", &b], 3600);
+    if !ok { return Err(m); }
+    Ok(if saved > 0 { format!("Synced. {saved} file(s) were also edited by a teammate. Their version was saved next to yours as “(conflict from teammate)”.") } else { "Synced with the studio NAS".into() })
+}
 #[tauri::command]
 async fn sync(app: AppHandle, st: State<'_, Vault>) -> R<String> {
     let r = root(&st)?;
-    let b = String::from_utf8_lossy(&git(&r, &["rev-parse", "--abbrev-ref", "HEAD"])).trim().to_string();
-    let (ok, m) = git_out(&r, &["fetch", "origin"]);
-    if !ok { return Err(format!("Can't reach the remote: {m}")); }
-    if git_out(&r, &["rev-parse", "--verify", &format!("origin/{b}")]).0 {
-        let (ok, m) = git_out(&r, &["merge", "--no-edit", "-X", "ours", &format!("origin/{b}")]);
-        if !ok { git(&r, &["merge", "--abort"]); return Err(format!("Merge failed, your local files were kept: {m}")); }
-    }
-    let (ok, m) = git_out(&r, &["push", "-u", "origin", &b]);
-    if !ok { return Err(m); }
-    let _ = scan(&r);
-    let _ = app.emit("vault-changed", ());
-    Ok("Synced with remote".into())
+    let res = sync_inner(&r);
+    if res.is_ok() { let _ = scan(&r); let _ = app.emit("vault-changed", ()); }
+    emit_sync(&app, &res);
+    res
 }
+#[derive(Serialize)]
+struct Check { git: bool, lfs: bool, ollama: bool, vision: bool, embed: bool }
+#[tauri::command]
+async fn system_check() -> R<Check> {
+    let t = |a: &[&str]| { let mut c = Command::new("git"); c.args(a); #[cfg(windows)] c.creation_flags(0x08000000); c.output().map(|o| o.status.success()).unwrap_or(false) };
+    let v: Option<Value> = ureq::get(&format!("{OLLAMA}/api/tags")).timeout(Duration::from_millis(1500)).call().ok().and_then(|r| r.into_json().ok());
+    let names: String = v.as_ref().and_then(|v| v["models"].as_array()).map(|a| a.iter().filter_map(|m| m["name"].as_str()).collect::<Vec<_>>().join(" ")).unwrap_or_default();
+    Ok(Check { git: t(&["--version"]), lfs: t(&["lfs", "version"]), ollama: v.is_some(), vision: names.contains("llava"), embed: names.contains("nomic-embed-text") })
+}
+#[tauri::command]
+async fn pull_model(name: String) -> R<()> {
+    ureq::post(&format!("{OLLAMA}/api/pull")).timeout(Duration::from_secs(7200)).send_json(json!({"model": name, "stream": false})).map_err(e)?;
+    Ok(())
+}
+#[tauri::command]
+async fn set_author(name: String) -> R<()> { *AUTHOR.lock().unwrap() = name; Ok(()) }
+#[tauri::command]
+async fn create_hub(path: String) -> R<String> {
+    let p = PathBuf::from(&path);
+    if !p.is_dir() { return Err("The NAS folder isn't reachable. Check the connection.".into()); }
+    let hub = if p.join("HEAD").exists() { p.clone() } else { p.join("stratum-vault.git") };
+    fs::create_dir_all(&hub).map_err(e)?;
+    if !hub.join("HEAD").exists() {
+        let (ok, m) = git_t(&hub, &["init", "--bare", "-b", "main"], 60);
+        if !ok { return Err(m); }
+    }
+    Ok(hub.to_string_lossy().to_string())
+}
+#[tauri::command]
+async fn join_hub(remote: String, dest: String) -> R<()> {
+    let d = PathBuf::from(&dest);
+    fs::create_dir_all(&d).map_err(e)?;
+    if fs::read_dir(&d).map_err(e)?.next().is_some() { return Err("Choose an empty folder for your local copy.".into()); }
+    let (ok, m) = git_t(&d, &["clone", &remote, "."], 7200);
+    if ok { Ok(()) } else { Err(m) }
+}
+
 
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+            let _ = CACHE.set(app.path().app_local_data_dir().unwrap_or_else(|_| std::env::temp_dir()).join("vaults"));
+            Ok(())
+        })
         .manage(Vault::default())
-        .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync])
+        .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync, system_check, pull_model, set_author, create_hub, join_hub])
         .run(tauri::generate_context!())
         .expect("failed to run Stratum");
 }

@@ -14,3 +14,10 @@ and stores embeddings in `<vault>/.stratum/index.db`. Without Ollama everything 
 
 Drag files or folders into the window to import them (copied to `Imported/`, then indexed and versioned automatically).
 SVG vector maps and PSD files get real thumbnails and AI tags. Use Git LFS for large binaries.
+
+## Where should assets live?
+- **This PC only**: simplest and fastest.
+- **This PC + NAS (recommended for teams)**: a local working copy for speed, plus a shared bare Git repository on the NAS (or any SSH/HTTPS Git server over LAN/VPN/WAN). Offline-safe; syncs in the background.
+- **Join**: clone an existing studio vault from the NAS.
+The index database and thumbnails always stay on the local machine (never on a network share). Folders on network drives are detected automatically and use polling plus a local git directory.
+Git LFS is opt-in: a plain NAS folder can't serve LFS objects.
