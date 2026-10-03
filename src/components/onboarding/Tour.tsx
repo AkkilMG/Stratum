@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useI18n } from "./i18n";
+import { useI18n } from "../../i18n";
 export type Step = { target?: string; title: string; body: string; needs?: string; ok?: boolean; art?: "drop" };
 type Btn = { label: string; onClick: () => void };
 const W = 340;

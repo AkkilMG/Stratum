@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
-import { call } from "./api";
-import { APP, getAcceptance } from "./legal";
-import { ArkLogo, ExtLink, Modal } from "./ui";
-import { LangPicker, dateOf, errText, useI18n, type Key } from "./i18n";
-import mark from "./assets/stratum-tile.png";
-import type { Check, Stats } from "./types";
+import { call } from "../../services/api";
+import { APP, getAcceptance } from "../../config/legal";
+import { ArkLogo, ExtLink, Modal } from "../common";
+import { LangPicker, dateOf, errText, useI18n, type Key } from "../../i18n";
+import mark from "../../assets/stratum-tile.png";
+import type { Check, Stats } from "../../types";
 
 export const copy = async (t: string) => { try { await navigator.clipboard.writeText(t); return true; } catch { return false; } };
 

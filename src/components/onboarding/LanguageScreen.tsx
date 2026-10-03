@@ -1,6 +1,6 @@
-import mark from "./assets/stratum-mark.png";
-import { LANGS, useI18n } from "./i18n";
-import { Credits } from "./ui";
+import mark from "../../assets/stratum-mark.png";
+import { LANGS, useI18n } from "../../i18n";
+import { Credits } from "../common";
 
 /** First screen after the splash: the user picks a language before seeing any policy. */
 export function LanguageScreen({ onDone }: { onDone: () => void }) {

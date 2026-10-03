@@ -42,8 +42,6 @@
         "type": "downloadBootstrapper"
       },
       "nsis": {
-        "installMode": "currentUser",
-        "licenseFile": "../LICENSE.txt",
         "headerImage": "installer/nsis-header.bmp",
         "sidebarImage": "installer/nsis-sidebar.bmp",
         "installerIcon": "icons/icon.ico"
@@ -65,7 +63,7 @@
         ]
       }
     },
-    "copyright": "\u00a9 2026 Arkynox. All rights reserved. Developed by Akkil M G.",
+    "copyright": "© 2026 Arkynox. All rights reserved. Developed by Akkil M G.",
     "resources": [
       "../THIRD_PARTY_NOTICES.txt",
       "../LICENSE.txt"

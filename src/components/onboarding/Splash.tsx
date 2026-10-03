@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
-import tile from "./assets/stratum-tile.png";
-import ark from "./assets/arkynox-studio-dark.svg";
-import { useI18n } from "./i18n";
+import tile from "../../assets/stratum-tile.png";
+import ark from "../../assets/arkynox-studio-dark.svg";
+import { useI18n } from "../../i18n";
 
 /** Brand splash: company first, then product. Waits for the space to open, never longer than 9 s. Click or any key skips. */
 export function Splash({ ready, onDone }: { ready: boolean; onDone: () => void }) {

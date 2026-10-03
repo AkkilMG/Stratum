@@ -1,4 +1,4 @@
-import type { Asset, Commit, Stats } from "./types";
+import type { Asset, Commit, Stats } from "../types";
 const now = () => Date.now() / 1000;
 const hue = (s: string) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
 const art = (seed: string, v = 0) => {

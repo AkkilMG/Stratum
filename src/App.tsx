@@ -2,19 +2,18 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { open } from "@tauri-apps/plugin-dialog";
-import { call, setDemo } from "./api";
-import { Tour, Step } from "./Tour";
-import Wizard from "./Wizard";
-import { Gate, LegalView } from "./Legal";
-import { About, Settings, copy } from "./Settings";
-import { Modal, Credits } from "./ui";
-import { Splash } from "./Splash";
-import { LanguageScreen } from "./Lang";
-import { POLICY_VERSION, getAcceptance } from "./legal";
-import { ago, errText, fmtBytes, msgText, tr, useI18n, type Key } from "./i18n";
+import { call, setDemo } from "./services/api";
+import { Tour, Step } from "./components/onboarding/Tour";
+import Wizard from "./components/onboarding/Wizard";
+import { Gate, LegalView } from "./components/legal";
+import { About, Settings, copy } from "./components/settings/Settings";
+import { Modal, Credits } from "./components/common";
+import { Splash } from "./components/onboarding/Splash";
+import { LanguageScreen } from "./components/onboarding/LanguageScreen";
+import { ago, errText, fmtBytes, msgText, tr, useI18n, type Key } from "./i18n"; import { POLICY_VERSION, getAcceptance } from "./config/legal";
 import mark from "./assets/stratum-mark.png";
 import type { Asset, Ask, Cfg, Check, Commit, Stats } from "./types";
-import "./styles.css";
+import "./styles/styles.css";
 
 type View = "overview" | "library" | "activity" | "settings" | "legal";
 type Sync = { ok: boolean; msg: string; at: number };
@@ -121,6 +120,7 @@ export default function App() {
   const { t, lang } = useI18n();
   const [splash, setSplash] = useState(true);
   const [langOk, setLangOk] = useState(localStorage.getItem("langOk") === "1");
+  const [legalOk, setLegalOk] = useState(!!getAcceptance() && getAcceptance()?.v === POLICY_VERSION);
   const [vault, setVault] = useState<string | null>(null);
   const [wizard, setWizard] = useState<{ start: number; mode?: Cfg["mode"] } | null>(null);
   const [booting, setBooting] = useState(!!localStorage.getItem("cfg"));
@@ -138,7 +138,6 @@ export default function App() {
   const [tag, setTag] = useState("");
   const [sort, setSort] = useState(localStorage.getItem("sort") || "recent");
   const [dense, setDense] = useState(localStorage.getItem("dense") === "1");
-  const [legalOk, setLegalOk] = useState(() => getAcceptance()?.v === POLICY_VERSION);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system");
   const [author, setAuthor] = useState(localStorage.getItem("author") || "");
   const [loading, setLoading] = useState(true);
@@ -252,8 +251,6 @@ export default function App() {
       `Git: ${c?.git}, Git LFS: ${c?.lfs}, Ollama: ${c?.ollama}, vision model: ${c?.vision}, search model: ${c?.embed}`].join("\n");
   };
   const accept = async () => {
-    localStorage.setItem("legal", JSON.stringify({ v: POLICY_VERSION, at: new Date().toISOString() }));
-    try { await call("record_acceptance", { version: POLICY_VERSION, user: localStorage.getItem("author") || "" }); } catch {}
     setLegalOk(true);
   };
 

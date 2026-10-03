@@ -1,4 +1,4 @@
-import { ErrorBoundary } from "./ui";
+import { ErrorBoundary } from "./components/common";
 import { I18nProvider } from "./i18n";
 import { createRoot } from "react-dom/client";
 import App from "./App";

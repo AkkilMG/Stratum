@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { call } from "./api";
-import { Credits } from "./ui";
-import { LangPicker, errText, useI18n, type Key } from "./i18n";
-import mark from "./assets/stratum-mark.png";
-import type { Cfg, Check } from "./types";
+import { call } from "../../services/api";
+import { Credits } from "../common";
+import { LangPicker, errText, useI18n, type Key } from "../../i18n";
+import mark from "../../assets/stratum-mark.png";
+import type { Cfg, Check } from "../../types";
 
 const STEPS: Key[] = ["w.t.welcome", "w.t.you", "w.t.storage", "w.t.folders", "w.t.check", "w.t.create"];
 const isUrl = (s: string) => /:\/\/|@/.test(s);
