@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { call } from "./api";
 import { Credits } from "./ui";
-import type { Cfg } from "./types";
+import { LangPicker, errText, useI18n, type Key } from "./i18n";
+import mark from "./assets/stratum-mark.png";
+import type { Cfg, Check } from "./types";
 
-type Check = { git: boolean; lfs: boolean; ollama: boolean; vision: boolean; embed: boolean };
-const STEPS = ["Welcome", "You", "Storage", "Folders", "Check", "Create"];
+const STEPS: Key[] = ["w.t.welcome", "w.t.you", "w.t.storage", "w.t.folders", "w.t.check", "w.t.create"];
 const isUrl = (s: string) => /:\/\/|@/.test(s);
 const pick = async () => { const p = await open({ directory: true }); return typeof p === "string" ? p : ""; };
 const I = {
@@ -15,6 +16,7 @@ const I = {
 };
 
 export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { start?: number; mode?: Cfg["mode"]; onTour: () => void; onSkip: () => void; onDone: (c: Cfg, remote: string | null, tour: boolean) => Promise<void> }) {
+  const { t } = useI18n();
   const [i, setI] = useState(start);
   const [c, setC] = useState<Cfg>({ name: localStorage.getItem("author") ?? "", mode: mode ?? "hub", local: "", nas: "", lfs: false });
   const [chk, setChk] = useState<Check | null>(null);
@@ -32,101 +34,94 @@ export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { st
 
   async function finish(tour: boolean) {
     setErr(""); setLog([]); setWorking(true);
-    const add = (s: string) => setLog((l) => [...l, s]);
+    const add = (s: Key) => setLog((l) => [...l, t(s)]);
     try {
       localStorage.setItem("author", c.name || "Me");
       await call("set_author", { name: c.name || "Me" });
       let remote: string | null = null;
       if (c.mode === "hub" && c.nas) {
-        if (isUrl(c.nas)) { remote = c.nas; add("Using your server address"); }
-        else { add("Creating the shared repository on your NAS…"); remote = await call<string>("create_hub", { path: c.nas }); add("Shared repository ready"); }
+        if (isUrl(c.nas)) { remote = c.nas; add("w.log_url"); }
+        else { add("w.log_hub"); remote = await call<string>("create_hub", { path: c.nas }); add("w.log_hub_ok"); }
       }
-      if (c.mode === "join") { add("Downloading your local copy (large vaults take a while)…"); await call("join_hub", { remote: c.nas, dest: c.local }); add("Local copy ready"); }
-      add("Indexing your folder…");
+      if (c.mode === "join") { add("w.log_join"); await call("join_hub", { remote: c.nas, dest: c.local }); add("w.log_join_ok"); }
+      add("w.log_index");
       await onDone(c, remote, tour);
-    } catch (e) { setErr(String(e)); setWorking(false); }
+    } catch (e) { setErr(errText(e)); setWorking(false); }
   }
-  const dl = async (m: string) => { setPull(m); try { await call("pull_model", { name: m }); } catch (e) { setErr(String(e)); } setPull(""); recheck(); };
+  const dl = async (m: string) => { setPull(m); try { await call("pull_model", { name: m }); } catch (e) { setErr(errText(e)); } setPull(""); recheck(); };
 
-  const row = (label: string, ok: boolean | undefined, req: string, help: string, act?: JSX.Element) => (
-    <div className="crow" key={label}><i className={"dot " + (ok ? "ok" : req === "Required" ? "bad" : "warn")} /><div><b>{label}</b> <em>{req}</em><small>{ok ? "Ready" : help}</small></div>{!ok && act}</div>
+  const row = (label: Key, ok: boolean | undefined, req: boolean, help: Key, act?: JSX.Element) => (
+    <div className="crow" key={label}><i className={"dot " + (ok ? "ok" : req ? "bad" : "warn")} /><div><b>{t(label)}</b> <em>{req ? t("c.required") : t("c.optional")}</em><small>{ok ? t("c.ready") : t(help)}</small></div>{!ok && act}</div>
   );
+  const dlBtn = (m: string) => <button className="ghostb" disabled={!chk?.ollama || !!pull} onClick={() => dl(m)}>{pull === m ? t("c.downloading") : t("c.download")}</button>;
+  const modes: [Cfg["mode"], JSX.Element, Key, Key, Key | ""][] = [["local", I.pc, "w.m_local", "w.m_local_d", ""], ["hub", I.nas, "w.m_hub", "w.m_hub_d", "w.m_hub_tag"], ["join", I.team, "w.m_join", "w.m_join_d", ""]];
 
   return (
     <div className="wiz">
       <div className="contours" aria-hidden />
-      <header className="wtop"><div className="brand"><i /><span>Stratum</span></div><Trail i={i} /><button className="link" onClick={onSkip}>Skip setup</button></header>
+      <header className="wtop"><div className="brand"><img className="mark" src={mark} alt="" /><span>Stratum</span></div><Trail i={i} /><LangPicker /><button className="link" onClick={onSkip}>{t("w.skip_setup")}</button></header>
       <div className="wscroll"><section className="wmain">
         {i === 0 && <>
-          <h1>Your studio’s assets, safe on your own machines.</h1>
-          <p className="lead">Stratum keeps every version of every texture, map and model, finds files by what they look like, and works fully offline. Nothing is uploaded to anyone’s cloud.</p>
-          <div className="row"><button className="primary big" onClick={() => setI(1)}>Set up my vault</button><button className="ghostb big" onClick={onTour}>Take the 60-second tour first</button><button className="link" onClick={onSkip}>Skip, I’ll explore on my own</button></div>
-          <p className="hint">New here? The tour uses sample files, so you can’t break anything.</p><Credits />
+          <h1>{t("w.h1")}</h1>
+          <p className="lead">{t("w.lead")}</p>
+          <div className="row"><button className="primary big" onClick={() => setI(1)}>{t("w.setup")}</button><button className="ghostb big" onClick={onTour}>{t("w.tour_first")}</button><button className="link" onClick={onSkip}>{t("w.explore")}</button></div>
+          <p className="hint">{t("w.tour_hint")}</p><Credits logo />
         </>}
         {i === 1 && <>
-          <h2>What should we call you?</h2>
-          <p className="lead sm">Your name appears next to every change you save, so teammates can see who did what.</p>
-          <input className="field big" autoFocus value={c.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Maya Chen" onKeyDown={(e) => e.key === "Enter" && can && setI(2)} />
+          <h2>{t("w.name_h")}</h2><p className="lead sm">{t("w.name_lead")}</p>
+          <input className="field big" autoFocus value={c.name} onChange={(e) => set({ name: e.target.value })} placeholder={t("w.name_ph")} onKeyDown={(e) => e.key === "Enter" && can && setI(2)} />
         </>}
         {i === 2 && <>
-          <h2>Where will your assets live?</h2>
-          <p className="lead sm">Pick the setup that matches how your studio works. You can connect a NAS later.</p>
-          <div className="modes">
-            {([["local", I.pc, "Just this PC", "Files stay on this computer. Fastest option for solo work.", ""], ["hub", I.nas, "This PC + studio NAS", "Work on a fast local copy. A shared repository on your NAS keeps everyone in sync, and nothing stops if the NAS goes offline.", "Recommended for teams"], ["join", I.team, "Join my studio’s vault", "A teammate already set one up. Download a local copy and start.", ""]] as const).map(([m, ic, t, d, tag]) => (
-              <button key={m} className={"mode" + (c.mode === m ? " on" : "")} onClick={() => set({ mode: m })}>{ic}<b>{t}</b><span>{d}</span>{tag && <em>{tag}</em>}</button>
-            ))}
-          </div>
-          <details className="why"><summary>Why not edit directly on the NAS?</summary>
-            Network drives are slow for thumbnails and databases, and several people writing the same version history at once can corrupt it. Stratum keeps your working copy local for speed and syncs with the NAS in the background, over LAN or VPN. If the NAS is unreachable, work continues and syncs when it’s back.</details>
+          <h2>{t("w.where_h")}</h2><p className="lead sm">{t("w.where_lead")}</p>
+          <div className="modes">{modes.map(([m, ic, tt, d, tag]) => (
+            <button key={m} className={"mode" + (c.mode === m ? " on" : "")} onClick={() => set({ mode: m })}>{ic}<b>{t(tt)}</b><span>{t(d)}</span>{tag && <em>{t(tag)}</em>}</button>))}</div>
+          <details className="why"><summary>{t("w.why_sum")}</summary>{t("w.why")}</details>
         </>}
         {i === 3 && <>
-          <h2>{c.mode === "join" ? "Connect to the studio vault" : c.mode === "hub" ? "Choose your folders" : "Choose your asset folder"}</h2>
-          {c.mode === "join" && <Field label="Studio vault on the NAS" help="Pick the shared repository folder (ends in .git), or paste a server address like ssh://git@nas/assets.git." v={c.nas} set={(v) => set({ nas: v })} />}
-          <Field label={c.mode === "join" ? "Empty folder for your local copy" : "Your working folder on this PC"} help={c.mode === "join" ? "Choose a new, empty folder on a fast local drive." : "Existing files are indexed in place. Nothing is moved or changed."} v={c.local} set={(v) => set({ local: v })} />
-          {c.mode === "hub" && <Field label="Studio NAS location" help="Pick a folder on your mounted NAS (like Z:\ or \\nas\studio), or paste a server address for a remote Git server over WAN or VPN." v={c.nas} set={(v) => set({ nas: v })} />}
-          <details className="why"><summary>Advanced</summary>
-            <label className="chk"><input type="checkbox" checked={c.lfs} onChange={(e) => set({ lfs: e.target.checked })} /> My server supports Git LFS (Gitea, GitLab, GitHub). Leave off for a NAS folder.</label></details>
-          {c.mode === "hub" && <button className="link" onClick={() => set({ mode: "local", nas: "" })}>Skip the NAS for now</button>}
+          <h2>{c.mode === "join" ? t("w.f_join_h") : c.mode === "hub" ? t("w.f_hub_h") : t("w.f_local_h")}</h2>
+          {c.mode === "join" && <Field label={t("w.fld_join_nas")} help={t("w.fld_join_nas_d")} v={c.nas} set={(v) => set({ nas: v })} />}
+          <Field label={c.mode === "join" ? t("w.fld_join_local") : t("w.fld_local")} help={c.mode === "join" ? t("w.fld_join_local_d") : t("w.fld_local_d")} v={c.local} set={(v) => set({ local: v })} />
+          {c.mode === "hub" && <Field label={t("w.fld_nas")} help={t("w.fld_nas_d")} v={c.nas} set={(v) => set({ nas: v })} />}
+          <details className="why"><summary>{t("w.adv")}</summary><label className="chk"><input type="checkbox" checked={c.lfs} onChange={(e) => set({ lfs: e.target.checked })} /> {t("w.lfs")}</label></details>
+          {c.mode === "hub" && <button className="link" onClick={() => set({ mode: "local", nas: "" })}>{t("w.skip_nas")}</button>}
         </>}
         {i === 4 && <>
-          <h2>System check</h2>
-          <p className="lead sm">Only Git is required. The local AI is optional and powers automatic tags and search by meaning.</p>
-          <div className="checks">
-            {!chk ? <p className="hint">Checking…</p> : <>
-              {row("Git", chk.git, "Required", "Install Git from git-scm.com, then press Re-check.")}
-              {row("Ollama (local AI)", chk.ollama, "Optional", "Install from ollama.com and keep it running.")}
-              {row("Vision model (llava:7b)", chk.vision, "Optional", "Reads your images to suggest tags.", <button className="ghostb" disabled={!chk.ollama || !!pull} onClick={() => dl("llava:7b")}>{pull === "llava:7b" ? "Downloading…" : "Download"}</button>)}
-              {row("Search model (nomic-embed-text)", chk.embed, "Optional", "Lets you search by meaning.", <button className="ghostb" disabled={!chk.ollama || !!pull} onClick={() => dl("nomic-embed-text")}>{pull === "nomic-embed-text" ? "Downloading…" : "Download"}</button>)}
-              {row("Git LFS", chk.lfs, "Optional", "Only used if your server supports it.")}
-            </>}
-          </div>
-          <button className="link" onClick={recheck}>Re-check</button>
+          <h2>{t("w.chk_h")}</h2><p className="lead sm">{t("w.chk_lead")}</p>
+          <div className="checks">{!chk ? <p className="hint">{t("c.checking")}</p> : <>
+            {row("w.chk_git", chk.git, true, "w.chk_git_h")}
+            {row("w.chk_ollama", chk.ollama, false, "w.chk_ollama_h")}
+            {row("w.chk_vision", chk.vision, false, "w.chk_vision_h", dlBtn("llava:7b"))}
+            {row("w.chk_embed", chk.embed, false, "w.chk_embed_h", dlBtn("nomic-embed-text"))}
+            {row("w.chk_lfs", chk.lfs, false, "w.chk_lfs_h")}</>}</div>
+          <button className="link" onClick={recheck}>{t("c.recheck")}</button>
         </>}
         {i === 5 && <>
-          <h2>Ready to create your vault</h2>
-          <dl className="sum"><dt>Name</dt><dd>{c.name}</dd><dt>Setup</dt><dd>{{ local: "This PC only", hub: c.nas ? "This PC + studio NAS" : "This PC only", join: "Joining a studio vault" }[c.mode]}</dd><dt>Local folder</dt><dd>{c.local}</dd>{c.nas && <><dt>NAS</dt><dd>{c.nas}</dd></>}</dl>
+          <h2>{t("w.create_h")}</h2>
+          <dl className="sum"><dt>{t("w.sum_name")}</dt><dd>{c.name}</dd><dt>{t("w.sum_setup")}</dt><dd>{{ local: t("w.s_local"), hub: c.nas ? t("w.s_hub") : t("w.s_local"), join: t("w.s_join") }[c.mode]}</dd><dt>{t("w.sum_local")}</dt><dd>{c.local}</dd>{c.nas && <><dt>{t("w.sum_nas")}</dt><dd>{c.nas}</dd></>}</dl>
           {log.map((l) => <p className="step ok" key={l}>✓ {l}</p>)}
-          {working && !err && <p className="step"><i className="spin" /> Working…</p>}
-          <div className="row"><button className="primary big" disabled={working} onClick={() => finish(true)}>Create vault and show me around</button><button className="ghostb big" disabled={working} onClick={() => finish(false)}>Create vault</button></div>
+          {working && !err && <p className="step"><i className="spin" /> {t("c.working")}</p>}
+          <div className="row"><button className="primary big" disabled={working} onClick={() => finish(true)}>{t("w.create_tour")}</button><button className="ghostb big" disabled={working} onClick={() => finish(false)}>{t("w.create")}</button></div>
         </>}
         {err && <p className="err">{err}</p>}
       </section></div>
-      {i > 0 && <footer className="wfoot"><button className="ghostb" disabled={working} onClick={() => setI(i - 1)}>Back</button>{i < 5 && <button className="primary" disabled={!can} onClick={() => setI(i + 1)}>Continue</button>}</footer>}
+      {i > 0 && <footer className="wfoot"><button className="ghostb" disabled={working} onClick={() => setI(i - 1)}>{t("c.back")}</button>{i < 5 && <button className="primary" disabled={!can} onClick={() => setI(i + 1)}>{t("c.continue")}</button>}</footer>}
     </div>
   );
 }
 
 function Field({ label, help, v, set }: { label: string; help: string; v: string; set: (v: string) => void }) {
+  const { t } = useI18n();
   return (
     <div className="fld"><b>{label}</b><small>{help}</small>
-      <div className="row"><input className="field" value={v} onChange={(e) => set(e.target.value)} placeholder="Choose a folder or paste an address" /><button className="ghostb" onClick={async () => { const p = await pick(); if (p) set(p); }}>Browse</button></div></div>
+      <div className="row"><input className="field" value={v} onChange={(e) => set(e.target.value)} placeholder={t("w.fld_ph")} /><button className="ghostb" onClick={async () => { const p = await pick(); if (p) set(p); }}>{t("c.browse")}</button></div></div>
   );
 }
 
 function Trail({ i }: { i: number }) {
+  const { t } = useI18n();
   return (
     <ol className="trail" aria-label="Setup progress">
-      {STEPS.map((s, k) => <li key={s} className={k === i ? "on" : k < i ? "past" : ""} aria-current={k === i ? "step" : undefined}><i>{k < i ? "✓" : k + 1}</i><span>{s}</span></li>)}
+      {STEPS.map((s, k) => <li key={s} className={k === i ? "on" : k < i ? "past" : ""} aria-current={k === i ? "step" : undefined}><i>{k < i ? "✓" : k + 1}</i><span>{t(s)}</span></li>)}
     </ol>
   );
 }

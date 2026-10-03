@@ -78,7 +78,7 @@ fn git_t(root: &Path, args: &[&str], secs: u64) -> (bool, String) {
         match ch.try_wait() {
             Ok(Some(_)) => break,
             Ok(None) => {
-                if start.elapsed().as_secs() > secs { let _ = ch.kill(); return (false, "Timed out. The remote didn't respond.".into()); }
+                if start.elapsed().as_secs() > secs { let _ = ch.kill(); return (false, "E:timeout".into()); }
                 thread::sleep(Duration::from_millis(100));
             }
             Err(x) => return (false, x.to_string()),
@@ -98,7 +98,7 @@ fn emit_sync(app: &AppHandle, res: &R<String>) {
 
 #[derive(Default)]
 struct Vault { root: Mutex<Option<PathBuf>>, watcher: Mutex<Option<Box<dyn Watcher + Send>>> }
-fn root(s: &State<'_, Vault>) -> R<PathBuf> { s.root.lock().unwrap().clone().ok_or_else(|| "No vault open".to_string()) }
+fn root(s: &State<'_, Vault>) -> R<PathBuf> { s.root.lock().unwrap().clone().ok_or_else(|| "E:no_space".to_string()) }
 
 #[derive(Serialize)]
 struct Asset { path: String, name: String, kind: String, size: i64, mtime: i64, tags: String, tagged: bool }
@@ -253,9 +253,9 @@ fn tag_pending(app: &AppHandle, root: &Path) {
 #[tauri::command]
 async fn open_vault(path: String, lfs: bool, remote: Option<String>, app: AppHandle, st: State<'_, Vault>) -> R<()> {
     let r = PathBuf::from(&path);
-    if !r.is_dir() { return Err("This folder isn't available. If it lives on a NAS, check the connection and retry.".into()); }
+    if !r.is_dir() { return Err("E:folder_missing".into()); }
     let probe = r.join(".stratum-write-test");
-    fs::write(&probe, b"ok").map_err(|_| "Stratum can't write to this folder. Check its permissions.".to_string())?;
+    fs::write(&probe, b"ok").map_err(|_| "E:not_writable".to_string())?;
     let _ = fs::remove_file(&probe);
     db(&r)?;
     init_git(&r, lfs);
@@ -489,15 +489,15 @@ async fn set_remote(url: String, st: State<'_, Vault>) -> R<()> {
 fn sync_inner(r: &Path) -> R<String> {
     let _g = GIT_LOCK.lock().unwrap_or_else(|p| p.into_inner());
     let (has, u) = git_out(r, &["remote", "get-url", "origin"]);
-    if !has { return Err("No NAS or server is connected yet.".into()); }
+    if !has { return Err("E:no_remote".into()); }
     if !u.contains("://") && !u.contains('@') && !Path::new(&u).exists() {
-        return Err("The NAS isn't reachable. Your work is safe on this PC and will sync when it's back.".into());
+        return Err("E:nas_down".into());
     }
-    if !git_out(r, &["rev-parse", "HEAD"]).0 { return Err("Nothing to sync yet.".into()); }
+    if !git_out(r, &["rev-parse", "HEAD"]).0 { return Err("E:nothing".into()); }
     commit_raw(r, "Save before sync");
     let b = git_out(r, &["rev-parse", "--abbrev-ref", "HEAD"]).1;
     let (ok, m) = git_t(r, &["fetch", "origin"], 90);
-    if !ok { return Err(format!("Remote not reachable: {m}")); }
+    if !ok { return Err(format!("E:remote_down:{m}")); }
     let rb = format!("origin/{b}");
     let mut saved = 0;
     if git_out(r, &["rev-parse", "--verify", &rb]).0 {
@@ -517,11 +517,11 @@ fn sync_inner(r: &Path) -> R<String> {
         }
         let id = format!("user.name={}", author());
         let (ok, m) = git_out(r, &["-c", &id, "-c", "user.email=stratum@local", "merge", "--no-edit", "--allow-unrelated-histories", "-X", "ours", &rb]);
-        if !ok { git(r, &["merge", "--abort"]); return Err(format!("Couldn't merge. Your local files were kept. {m}")); }
+        if !ok { git(r, &["merge", "--abort"]); return Err(format!("E:merge:{m}")); }
     }
     let (ok, m) = git_t(r, &["push", "-u", "origin", &b], 3600);
     if !ok { return Err(m); }
-    Ok(if saved > 0 { format!("Synced. {saved} file(s) were also edited by a teammate. Their version was saved next to yours as “(conflict from teammate)”.") } else { "Synced with the studio NAS".into() })
+    Ok(if saved > 0 { format!("M:conflicts:{saved}") } else { "M:synced".into() })
 }
 #[tauri::command]
 async fn sync(app: AppHandle, st: State<'_, Vault>) -> R<String> {
@@ -550,7 +550,7 @@ async fn set_author(name: String) -> R<()> { *AUTHOR.lock().unwrap() = name; Ok(
 #[tauri::command]
 async fn create_hub(path: String) -> R<String> {
     let p = PathBuf::from(&path);
-    if !p.is_dir() { return Err("The NAS folder isn't reachable. Check the connection.".into()); }
+    if !p.is_dir() { return Err("E:hub_down".into()); }
     let hub = if p.join("HEAD").exists() { p.clone() } else { p.join("stratum-vault.git") };
     fs::create_dir_all(&hub).map_err(e)?;
     if !hub.join("HEAD").exists() {
@@ -563,7 +563,7 @@ async fn create_hub(path: String) -> R<String> {
 async fn join_hub(remote: String, dest: String) -> R<()> {
     let d = PathBuf::from(&dest);
     fs::create_dir_all(&d).map_err(e)?;
-    if fs::read_dir(&d).map_err(e)?.next().is_some() { return Err("Choose an empty folder for your local copy.".into()); }
+    if fs::read_dir(&d).map_err(e)?.next().is_some() { return Err("E:not_empty".into()); }
     let (ok, m) = git_t(&d, &["clone", &remote, "."], 7200);
     if ok { Ok(()) } else { Err(m) }
 }

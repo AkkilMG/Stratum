@@ -59,3 +59,20 @@ The `.deb`, `.rpm` and `.AppImage` appear in `dist-linux\`. Install on Ubuntu/De
 - `THIRD_PARTY_NOTICES.txt` and `src/licenses.json`: every shipped open-source dependency with its license files. Regenerate with `npm run licenses` (needs `cargo` and `npm install`). It runs automatically before every `tauri build`, so installers always carry the full list for their own platform.
 - Note: resvg/usvg and a few related crates are MPL-2.0 (unmodified). Git, Ollama and AI models are used but not bundled (see `legal/EXTERNAL.md`).
 - The legal text is a working draft. Have a qualified lawyer review the EULA and privacy policy (governing law, liability caps, commercial terms) before distributing commercially.
+
+## Branding
+- `src-tauri/icons/` and `app-icon.png`: the Stratum app icon (rounded dark tile), generated for Windows (.ico), macOS (.icns) and Linux (PNG). Regenerate after changing `app-icon.png` with `npm run icons`.
+- `src/assets/`: logos used inside the app. The Stratum mark (small, transparent) and tile (large), Arkynox Studio logo in a light version (PNG) and a dark version (SVG). The app switches between them with the theme.
+- `src-tauri/installer/`: branded artwork for the NSIS and MSI installers.
+- `branding/`: clean transparent versions of the logos for marketing and docs (SVG and PNG), including the Arkynox Tech logo.
+- Splash screen: `src/Splash.tsx` (Arkynox first, then Stratum, about 3 seconds, skips on click or key, waits for the last space to open).
+
+## Languages
+English (default), Spanish, Russian, Hindi, French and German, in a formal register. The user picks a language on the very first screen, before any policy is shown, and can change it any time in Settings; the whole app updates instantly.
+- Dictionaries: `src/locales/*.ts`. `en.ts` is the source; the other files are type-checked against it, so a missing key fails the build. Keep `{placeholders}` identical.
+- The Summary tab of the policy gate is translated. The full License Agreement and Privacy Policy stay in English, which is the legally binding text (stated in the app).
+- Backend errors are sent as codes (`E:nas_down`) and translated in the UI.
+- Adding a language: copy `en.ts`, translate, then register it in `src/i18n.tsx` (`LANGS`, `D`).
+
+## Contact
+Support, bugs, vulnerabilities, feedback, feature requests and policy questions: support@arkynox.com. General: hello@arkynox.com. Website: https://arkynox.com

@@ -17,7 +17,8 @@ const DEMO: Asset[] = [
   A("tank_model.fbx", "Model", 310, 150000, "vehicle, tank, military, 3d model"),
   A("ruins_texture.png", "Image", 18.6, 300000, "ruins, stone, tileable texture, grey"),
 ];
-const SYN: Record<string, string[]> = { water: ["ocean", "river", "waves"], sand: ["desert"], dunes: ["desert"], sea: ["ocean"], red: ["orange"], menu: ["ui"], hud: ["ui"], vehicle: ["tank"] };
+const W = ["ocean", "river", "waves"];
+const SYN: Record<string, string[]> = { water: W, agua: W, вода: W, पानी: W, eau: W, wasser: W, sand: ["desert"], dunes: ["desert"], sea: ["ocean"], red: ["orange"], menu: ["ui"], hud: ["ui"], vehicle: ["tank"] };
 const ago = ["2 hours ago", "yesterday", "3 days ago", "last week"];
 const hist = (n: string): Commit[] => ago.map((w, i) => ({ hash: ["a1b2c3d", "e4f5a6b", "7c8d9e0", "1f2a3b4"][i], author: "You", when: w, msg: i === 0 ? `Update ${n}` : i === 3 ? `Add ${n}` : `Update ${n}` }));
 export async function demoCall(cmd: string, a?: Record<string, unknown>): Promise<unknown> {
@@ -32,7 +33,7 @@ export async function demoCall(cmd: string, a?: Record<string, unknown>): Promis
     case "get_remote": return "\\\\nas\\studio\\assets.git";
     case "import_files": return 3;
     case "system_check": return { git: true, lfs: true, ollama: true, vision: true, embed: true };
-    case "sync": return "Synced with the studio NAS";
+    case "sync": return "M:synced";
     case "search": {
       const ws = String(a?.query ?? "").toLowerCase().split(/\s+/).filter(Boolean).flatMap((w) => [w, ...(SYN[w] ?? [])]);
       return DEMO.filter((x) => ws.some((w) => (x.name + " " + x.tags).toLowerCase().includes(w)));

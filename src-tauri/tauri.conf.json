@@ -15,7 +15,8 @@
         "width": 1360,
         "height": 860,
         "minWidth": 1000,
-        "minHeight": 640
+        "minHeight": 640,
+        "backgroundColor": "#0b1018"
       }
     ],
     "security": {
@@ -28,8 +29,9 @@
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
-      "icons/icon.ico",
-      "icons/icon.png"
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ],
     "shortDescription": "Local-first game asset vault",
     "longDescription": "Versioned, searchable, offline-first management for game art, maps and 3D models.",
@@ -41,7 +43,14 @@
       },
       "nsis": {
         "installMode": "currentUser",
-        "licenseFile": "../LICENSE.txt"
+        "licenseFile": "../LICENSE.txt",
+        "headerImage": "installer/nsis-header.bmp",
+        "sidebarImage": "installer/nsis-sidebar.bmp",
+        "installerIcon": "icons/icon.ico"
+      },
+      "wix": {
+        "bannerPath": "installer/wix-banner.bmp",
+        "dialogImagePath": "installer/wix-dialog.bmp"
       }
     },
     "linux": {
