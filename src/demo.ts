@@ -31,6 +31,7 @@ export async function demoCall(cmd: string, a?: Record<string, unknown>): Promis
     case "activity": return DEMO.slice(0, 6).map((x, i) => ({ hash: "a1b2c" + i, author: i % 2 ? "Maya" : "You", when: ago[i % 4], msg: `Update ${x.name}` }));
     case "get_remote": return "\\\\nas\\studio\\assets.git";
     case "import_files": return 3;
+    case "system_check": return { git: true, lfs: true, ollama: true, vision: true, embed: true };
     case "sync": return "Synced with the studio NAS";
     case "search": {
       const ws = String(a?.query ?? "").toLowerCase().split(/\s+/).filter(Boolean).flatMap((w) => [w, ...(SYN[w] ?? [])]);

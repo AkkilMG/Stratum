@@ -3,12 +3,19 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "dev": "vite", "build": "tsc && vite build", "tauri": "tauri" },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "tauri": "tauri",
+    "icons": "tauri icon app-icon.png",
+    "licenses": "node scripts/gen-licenses.mjs"
+  },
   "dependencies": {
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/plugin-dialog": "^2.0.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "@tauri-apps/plugin-opener": "^2.0.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0",
@@ -17,5 +24,12 @@
     "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
-  }
+  },
+  "description": "Stratum: local-first asset vault for game studios, by Arkynox",
+  "author": {
+    "name": "Akkil M G",
+    "url": "https://github.com/AkkilMG"
+  },
+  "homepage": "https://arkynox.com",
+  "license": "SEE LICENSE IN LICENSE.txt"
 }

@@ -1,1 +1,11 @@
-{ "identifier": "default", "windows": ["main"], "permissions": ["core:default", "dialog:default"] }
+{
+  "identifier": "default",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "opener:default"
+  ]
+}

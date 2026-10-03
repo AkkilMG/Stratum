@@ -569,15 +569,29 @@ async fn join_hub(remote: String, dest: String) -> R<()> {
 }
 
 
+#[tauri::command]
+async fn record_acceptance(version: String, user: String, app: AppHandle) -> R<()> {
+    let dir = app.path().app_local_data_dir().map_err(e)?;
+    fs::create_dir_all(&dir).map_err(e)?;
+    let at = std::time::SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
+    let p = dir.join("acceptance.json");
+    let mut v: Vec<Value> = fs::read_to_string(&p).ok().and_then(|s| serde_json::from_str(&s).ok()).unwrap_or_default();
+    v.push(json!({"version": version, "user": user, "accepted_at_unix": at, "os": std::env::consts::OS}));
+    fs::write(&p, serde_json::to_string_pretty(&v).unwrap_or_default()).map_err(e)
+}
+#[tauri::command]
+fn quit(app: AppHandle) { app.exit(0); }
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let _ = CACHE.set(app.path().app_local_data_dir().unwrap_or_else(|_| std::env::temp_dir()).join("vaults"));
             Ok(())
         })
         .manage(Vault::default())
-        .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync, system_check, pull_model, set_author, create_hub, join_hub])
+        .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync, system_check, pull_model, set_author, create_hub, join_hub, record_acceptance, quit])
         .run(tauri::generate_context!())
         .expect("failed to run Stratum");
 }

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { call } from "./api";
+import { Credits } from "./ui";
 import type { Cfg } from "./types";
 
 type Check = { git: boolean; lfs: boolean; ollama: boolean; vision: boolean; embed: boolean };
-const STEPS = ["Welcome", "About you", "Where files live", "Folders", "System check", "Create"];
+const STEPS = ["Welcome", "You", "Storage", "Folders", "Check", "Create"];
 const isUrl = (s: string) => /:\/\/|@/.test(s);
 const pick = async () => { const p = await open({ directory: true }); return typeof p === "string" ? p : ""; };
 const I = {
@@ -13,9 +14,9 @@ const I = {
   team: <svg viewBox="0 0 48 48"><circle cx="18" cy="17" r="6" /><circle cx="33" cy="19" r="5" /><path d="M6 40c0-8 6-12 12-12s12 4 12 12M31 29c6 0 11 4 11 11" /></svg>,
 };
 
-export default function Wizard({ start = 0, onTour, onDone }: { start?: number; onTour: () => void; onDone: (c: Cfg, remote: string | null, tour: boolean) => Promise<void> }) {
+export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { start?: number; mode?: Cfg["mode"]; onTour: () => void; onSkip: () => void; onDone: (c: Cfg, remote: string | null, tour: boolean) => Promise<void> }) {
   const [i, setI] = useState(start);
-  const [c, setC] = useState<Cfg>({ name: localStorage.getItem("author") ?? "", mode: "hub", local: "", nas: "", lfs: false });
+  const [c, setC] = useState<Cfg>({ name: localStorage.getItem("author") ?? "", mode: mode ?? "hub", local: "", nas: "", lfs: false });
   const [chk, setChk] = useState<Check | null>(null);
   const [pull, setPull] = useState("");
   const [log, setLog] = useState<string[]>([]);
@@ -33,8 +34,8 @@ export default function Wizard({ start = 0, onTour, onDone }: { start?: number; 
     setErr(""); setLog([]); setWorking(true);
     const add = (s: string) => setLog((l) => [...l, s]);
     try {
-      localStorage.setItem("author", c.name);
-      await call("set_author", { name: c.name });
+      localStorage.setItem("author", c.name || "Me");
+      await call("set_author", { name: c.name || "Me" });
       let remote: string | null = null;
       if (c.mode === "hub" && c.nas) {
         if (isUrl(c.nas)) { remote = c.nas; add("Using your server address"); }
@@ -54,15 +55,13 @@ export default function Wizard({ start = 0, onTour, onDone }: { start?: number; 
   return (
     <div className="wiz">
       <div className="contours" aria-hidden />
-      <aside className="wside"><div className="brand"><i />Stratum</div>
-        <ol>{STEPS.map((s, k) => <li key={s} className={k === i ? "on" : k < i ? "past" : ""}><i>{k < i ? "✓" : k + 1}</i>{s}</li>)}</ol>
-      </aside>
-      <section className="wmain">
+      <header className="wtop"><div className="brand"><i /><span>Stratum</span></div><Trail i={i} /><button className="link" onClick={onSkip}>Skip setup</button></header>
+      <div className="wscroll"><section className="wmain">
         {i === 0 && <>
           <h1>Your studio’s assets, safe on your own machines.</h1>
           <p className="lead">Stratum keeps every version of every texture, map and model, finds files by what they look like, and works fully offline. Nothing is uploaded to anyone’s cloud.</p>
-          <div className="row"><button className="primary big" onClick={() => setI(1)}>Set up my vault</button><button className="ghostb big" onClick={onTour}>Take the 60-second tour first</button></div>
-          <p className="hint">New here? The tour uses sample files, so you can’t break anything.</p>
+          <div className="row"><button className="primary big" onClick={() => setI(1)}>Set up my vault</button><button className="ghostb big" onClick={onTour}>Take the 60-second tour first</button><button className="link" onClick={onSkip}>Skip, I’ll explore on my own</button></div>
+          <p className="hint">New here? The tour uses sample files, so you can’t break anything.</p><Credits />
         </>}
         {i === 1 && <>
           <h2>What should we call you?</h2>
@@ -111,8 +110,8 @@ export default function Wizard({ start = 0, onTour, onDone }: { start?: number; 
           <div className="row"><button className="primary big" disabled={working} onClick={() => finish(true)}>Create vault and show me around</button><button className="ghostb big" disabled={working} onClick={() => finish(false)}>Create vault</button></div>
         </>}
         {err && <p className="err">{err}</p>}
-        {i > 0 && <div className="nav2"><button className="ghostb" disabled={working} onClick={() => setI(i - 1)}>Back</button>{i < 5 && <button className="primary" disabled={!can} onClick={() => setI(i + 1)}>Continue</button>}</div>}
-      </section>
+      </section></div>
+      {i > 0 && <footer className="wfoot"><button className="ghostb" disabled={working} onClick={() => setI(i - 1)}>Back</button>{i < 5 && <button className="primary" disabled={!can} onClick={() => setI(i + 1)}>Continue</button>}</footer>}
     </div>
   );
 }
@@ -121,5 +120,13 @@ function Field({ label, help, v, set }: { label: string; help: string; v: string
   return (
     <div className="fld"><b>{label}</b><small>{help}</small>
       <div className="row"><input className="field" value={v} onChange={(e) => set(e.target.value)} placeholder="Choose a folder or paste an address" /><button className="ghostb" onClick={async () => { const p = await pick(); if (p) set(p); }}>Browse</button></div></div>
+  );
+}
+
+function Trail({ i }: { i: number }) {
+  return (
+    <ol className="trail" aria-label="Setup progress">
+      {STEPS.map((s, k) => <li key={s} className={k === i ? "on" : k < i ? "past" : ""} aria-current={k === i ? "step" : undefined}><i>{k < i ? "✓" : k + 1}</i><span>{s}</span></li>)}
+    </ol>
   );
 }

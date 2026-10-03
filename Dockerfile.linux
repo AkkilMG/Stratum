@@ -1,0 +1,13 @@
+# Builds the Linux packages (.deb, .rpm, .AppImage) from any machine that has Docker, including Windows.
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive APPIMAGE_EXTRACT_AND_RUN=1
+RUN apt-get update && apt-get install -y build-essential curl wget file git ca-certificates xz-utils \
+    libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libgtk-3-dev libxdo-dev \
+    && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+ENV PATH="/root/.cargo/bin:${PATH}"
+WORKDIR /app
+COPY . .
+RUN npm install && npm run icons && npm run tauri build
+CMD ["sh", "-c", "cp -r src-tauri/target/release/bundle/. /out/"]

@@ -2,6 +2,11 @@
 name = "stratum"
 version = "0.1.0"
 edition = "2021"
+description = "Stratum: local-first, versioned, searchable asset management for game studios. A product of Arkynox."
+authors = ["Akkil M G (https://github.com/AkkilMG)"]
+homepage = "https://arkynox.com"
+license-file = "../LICENSE.txt"
+publish = false
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
@@ -9,6 +14,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.32", features = ["bundled"] }
