@@ -4,5 +4,7 @@ export { Doc } from './Doc';
 export { ErrorBoundary } from './ErrorBoundary';
 export { ExtLink } from './ExtLink';
 export { Modal } from './Modal';
-export { Grid, Rows, X } from './icons';
+export { Check, Chev, Copy, Cpu, Drive, Globe, Grid, Info, LifeBuoy, Mail, Palette, Refresh, Rows, Search, Tag, User, X } from './icons';
+export { Combobox, type Opt } from './Combobox';
+export { LangPicker } from './LangPicker';
 export * from './ui-legacy';

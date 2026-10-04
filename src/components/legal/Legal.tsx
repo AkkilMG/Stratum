@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { APP, DOCS, POLICY_VERSION, getAcceptance } from "../../config/legal";
-import { ArkLogo, Credits, Doc, ExtLink } from "../common";
-import { LangPicker, dateOf, useI18n, type Key } from "../../i18n";
+import { ArkLogo, Credits, Doc, ExtLink, LangPicker } from "../common";
+import { dateOf, useI18n, type Key } from "../../i18n";
 import mark from "../../assets/stratum-mark.png";
 
 type Lic = { generated: string; packages: { n: string; v: string; l: string; r: string; e: string; f: string[] }[]; texts: Record<string, string> };

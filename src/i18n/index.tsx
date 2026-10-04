@@ -50,8 +50,3 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   return <Ctx.Provider value={{ lang, setLang }}>{children}</Ctx.Provider>;
 }
 export const useI18n = () => { const { lang, setLang } = useContext(Ctx); return { lang, setLang, t: tr }; };
-
-export function LangPicker({ className = "langsel" }: { className?: string }) {
-  const { lang, setLang, t } = useI18n();
-  return <select className={className} value={lang} onChange={(e) => setLang(e.target.value as Lang)} aria-label={t("lang.pick")}>{LANGS.map((l) => <option key={l.c} value={l.c} lang={l.c}>{l.n}</option>)}</select>;
-}

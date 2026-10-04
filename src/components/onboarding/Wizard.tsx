@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { call } from "../../services/api";
-import { Credits } from "../common";
-import { LangPicker, errText, useI18n, type Key } from "../../i18n";
+import { Credits, LangPicker } from "../common";
+import { errText, useI18n, type Key } from "../../i18n";
 import mark from "../../assets/stratum-mark.png";
 import type { Cfg, Check } from "../../types";
 

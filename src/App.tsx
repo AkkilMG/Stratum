@@ -7,10 +7,10 @@ import { Tour, Step } from "./components/onboarding/Tour";
 import Wizard from "./components/onboarding/Wizard";
 import { Gate, LegalView } from "./components/legal";
 import { About, Settings, copy } from "./components/settings/Settings";
-import { Modal, Credits, Grid, Rows, X } from "./components/common";
+import { Combobox, Modal, Credits, Grid, Rows, Tag, X } from "./components/common";
 import { Splash } from "./components/onboarding/Splash";
 import { LanguageScreen } from "./components/onboarding/LanguageScreen";
-import { ago, errText, fmtBytes, msgText, tr, useI18n, type Key } from "./i18n"; import { POLICY_VERSION, getAcceptance } from "./config/legal";
+import { ago, errText, fmtBytes, msgText, tr, useI18n, type Key } from "./i18n"; import { POLICY_VERSION, getAcceptance, saveAcceptance } from "./config/legal";
 import mark from "./assets/stratum-mark.png";
 import type { Asset, Ask, Cfg, Check, Commit, Stats } from "./types";
 import "./styles/styles.css";
@@ -231,7 +231,7 @@ export default function App() {
   }, [view, vault, stats?.commits]);
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
-      const typing = ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement?.tagName ?? "");
+      const typing = ["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement?.tagName ?? "") || document.activeElement?.getAttribute("role") === "combobox";
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setPal(""); }
       else if (e.key === "/" && !typing) { e.preventDefault(); searchRef.current?.focus(); }
       else if (e.key === "?" && !typing) setHelp(true);
@@ -258,13 +258,16 @@ export default function App() {
       `Git: ${c?.git}, Git LFS: ${c?.lfs}, Ollama: ${c?.ollama}, vision model: ${c?.vision}, search model: ${c?.embed}`].join("\n");
   };
   const accept = async () => {
+    saveAcceptance();
     setLegalOk(true);
+    /** Durable audit trail outside webview storage; never block leaving the gate on it. */
+    call("record_acceptance", { version: POLICY_VERSION, user: author || "unknown" }).catch(() => {});
   };
 
-  const topTags = useMemo(() => {
+  const allTags = useMemo(() => {
     const m = new Map<string, number>();
     assets.forEach((a) => tagList(a.tags).forEach((x) => m.set(x, (m.get(x) ?? 0) + 1)));
-    return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14);
+    return [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
   }, [assets]);
   const kinds = ["All", ...Array.from(new Set(assets.map((a) => a.kind)))];
   const shown = useMemo(() => {
@@ -377,11 +380,12 @@ export default function App() {
           <>
             <div className="bar2">
               <div className="chips">{kinds.map((k) => <button key={k} className={k === kind ? "on" : ""} onClick={() => setKind(k)}>{kname(k)}</button>)}</div>
-              <div className="tools"><select value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t("lib.sort")}><option value="recent">{t("lib.recent")}</option><option value="name">{t("lib.name")}</option><option value="size">{t("lib.largest")}</option></select>
+              <div className="tools">{allTags.length > 0 && <Combobox className="cbsz" icon={<Tag s={14} />} value={tag} onChange={setTag} label={t("lib.tags")}
+                options={[{ v: "", label: t("lib.all_tags") }, ...allTags.map(([x, n]) => ({ v: x, label: x, hint: String(n) }))]} />}
+                <Combobox className="cbsz" value={sort} onChange={setSort} label={t("lib.sort")} align="end"
+                  options={[{ v: "recent", label: t("lib.recent") }, { v: "name", label: t("lib.name") }, { v: "size", label: t("lib.largest") }]} />
                 <button className="icon" onClick={() => setDense(!dense)} aria-label={t("lib.layout")} title={t("lib.layout")}>{dense ? <Grid /> : <Rows />}</button></div>
             </div>
-            {topTags.length > 0 && <div className="chips small">{tag && <button className="on" onClick={() => setTag("")}>{tag} ×</button>}
-              {topTags.filter(([x]) => x !== tag).map(([x, n]) => <button key={x} onClick={() => setTag(x)}>{x} <em>{n}</em></button>)}</div>}
             <span className="count">{results ? t("lib.count_matches", { n: shown.length }) : t("lib.count_assets", { n: shown.length })}</span>
             {loading ? <div className="grid">{Array.from({ length: 12 }, (_, k) => <div className="skel tile-skel" key={k} />)}</div> : shown.length === 0 ? (
               <div className="empty big"><div className="dropart"><i /><b /><span>{t("tour.drop")}</span></div><p>{results ? t("lib.empty_search") : t("lib.empty")}</p></div>
