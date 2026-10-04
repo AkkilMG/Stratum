@@ -38,7 +38,7 @@ export function Modal({ title, onClose, children, wide }: { title: string; onClo
         <header>
           <h3>{title}</h3>
           <button className='icon' onClick={onClose} aria-label={t('c.close')}>
-            ???
+            ✕
           </button>
         </header>
         <div className='mbody'>{children}</div>

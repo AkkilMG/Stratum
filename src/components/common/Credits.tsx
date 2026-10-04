@@ -9,7 +9,7 @@ export function Credits({ logo }: { logo?: boolean }) {
     <p className='credits'>
       {logo && <ArkLogo height={28} />}
       <span>
-        {t('cr.product')} <ExtLink href={APP.site}>Arkynox</ExtLink> ?? {t('cr.dev')} {APP.developer} (<ExtLink href={APP.github}>@AkkilMG</ExtLink>)
+        {t('cr.product')} <ExtLink href={APP.site}>Arkynox</ExtLink> | {t('cr.dev')} {APP.developer} (<ExtLink href={APP.github}>@AkkilMG</ExtLink>)
       </span>
     </p>
   );
