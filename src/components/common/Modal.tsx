@@ -1,7 +1,8 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useI18n } from '../../i18n';
+import { X } from './icons';
 
-export function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
+export function Modal({ title, onClose, children, footer, wide }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
   const { t } = useI18n();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -31,17 +32,18 @@ export function Modal({ title, onClose, children, wide }: { title: string; onClo
       window.removeEventListener('keydown', k, true);
       prev?.focus();
     };
-  }, []);
+}, []);
   return (
-    <div className='cmdbg' onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className='mdbg' onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className={'modal' + (wide ? ' wide' : '')} role='dialog' aria-modal='true' aria-label={title} tabIndex={-1} ref={ref}>
         <header>
           <h3>{title}</h3>
-          <button className='icon' onClick={onClose} aria-label={t('c.close')}>
-            ✕
+          <button className='icon' onClick={onClose} aria-label={t('c.close')} title={t('c.close')}>
+            <X />
           </button>
         </header>
         <div className='mbody'>{children}</div>
+        {footer && <footer className='mfoot'>{footer}</footer>}
       </div>
     </div>
   );

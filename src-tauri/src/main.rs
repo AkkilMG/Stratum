@@ -384,7 +384,8 @@ async fn restore(path: String, hash: String, st: State<'_, Vault>) -> R<()> {
 }
 
 fn ignored(n: &str) -> bool {
-    n.ends_with('~') || n.ends_with(".tmp") || n.ends_with(".swp") || n.ends_with(".lock") || n.starts_with("~$") || n.starts_with(".~") || n == "Thumbs.db" || n == ".DS_Store"
+    // .stratum-tags.json is written by export_tags() into the watched root: reacting to it would rescan, recommit and re-tag forever.
+    n.ends_with('~') || n.ends_with(".tmp") || n.ends_with(".swp") || n.ends_with(".lock") || n.starts_with("~$") || n.starts_with(".~") || n == "Thumbs.db" || n == ".DS_Store" || n == ".stratum-tags.json"
 }
 fn git_out(root: &Path, args: &[&str]) -> (bool, String) {
     let mut c = Command::new("git");

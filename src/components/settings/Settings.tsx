@@ -14,21 +14,27 @@ export function About({ onClose, onLegal, diag, note }: { onClose: () => void; o
   const [ver, setVer] = useState("");
   useEffect(() => { getVersion().then(setVer).catch(() => setVer("0.1.0")); }, []);
   return (
-    <Modal title={t("ab.title")} onClose={onClose}>
+    <Modal title={t("ab.title")} onClose={onClose}
+      footer={<>
+        <button className="primary" onClick={() => { onClose(); onLegal(); }}>{t("ab.legal")}</button>
+        <button className="ghostb" onClick={async () => note((await copy(await diag())) ? t("s.diag_ok") : t("c.copy_fail"))}>{t("ab.diag")}</button>
+      </>}>
       <div className="about">
-        <img className="aboutlogo" src={mark} alt="" />
-        <h2>Stratum</h2><p className="hint">{t("ab.version", { v: ver })}</p>
+        <div className="abouthero">
+          <img className="aboutlogo" src={mark} alt="" />
+          <div>
+            <h2>Stratum</h2>
+            <p className="hint">{t("ab.version", { v: ver })}</p>
+          </div>
+        </div>
         <p className="lead sm">{t("ab.tag")}</p>
-        <ArkLogo height={44} />
-        <dl>
+        <dl className="aboutfacts">
           <dt>{t("ab.product_of")}</dt><dd><ExtLink href={APP.site}>Arkynox</ExtLink></dd>
           <dt>{t("ab.dev_by")}</dt><dd>{APP.developer} · <ExtLink href={APP.github}>@AkkilMG</ExtLink></dd>
           <dt>{t("ab.website")}</dt><dd><ExtLink href={APP.site}>arkynox.com</ExtLink></dd>
           <dt>{t("ab.support")}</dt><dd><ExtLink href={`mailto:${APP.support}`}>{APP.support}</ExtLink></dd>
         </dl>
-        <p className="hint">{t("ab.copy", { y: APP.year })}</p>
-        <div className="row"><button className="primary" onClick={() => { onClose(); onLegal(); }}>{t("ab.legal")}</button>
-          <button className="ghostb" onClick={async () => note((await copy(await diag())) ? t("s.diag_ok") : t("c.copy_fail"))}>{t("ab.diag")}</button></div>
+        <p className="hint aboutcopy"><ArkLogo height={18} />{t("ab.copy", { y: APP.year })}</p>
       </div>
     </Modal>
   );

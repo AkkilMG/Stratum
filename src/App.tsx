@@ -7,7 +7,7 @@ import { Tour, Step } from "./components/onboarding/Tour";
 import Wizard from "./components/onboarding/Wizard";
 import { Gate, LegalView } from "./components/legal";
 import { About, Settings, copy } from "./components/settings/Settings";
-import { Modal, Credits } from "./components/common";
+import { Modal, Credits, Grid, Rows, X } from "./components/common";
 import { Splash } from "./components/onboarding/Splash";
 import { LanguageScreen } from "./components/onboarding/LanguageScreen";
 import { ago, errText, fmtBytes, msgText, tr, useI18n, type Key } from "./i18n"; import { POLICY_VERSION, getAcceptance } from "./config/legal";
@@ -61,7 +61,7 @@ function Home({ spaces, busy, err, onOpen, onForget, onNew, onFolder, onJoin, on
       </div>
       {spaces.length > 0 && <><h3 className="sub">{t("h.spaces")}</h3>
         <ul className="spaces">{spaces.map((s) => (
-          <li key={s.local}><button onClick={() => onOpen(s)}><b>{base(s.local)}</b><span>{s.local}</span></button><button className="icon" aria-label={t("h.forget_n", { n: base(s.local) })} title={t("h.forget")} onClick={() => onForget(s)}>✕</button></li>))}</ul></>}
+          <li key={s.local}><button onClick={() => onOpen(s)}><b>{base(s.local)}</b><span>{s.local}</span></button><button className="icon" aria-label={t("h.forget_n", { n: base(s.local) })} title={t("h.forget")} onClick={() => onForget(s)}><X /></button></li>))}</ul></>}
       {busy && <p className="hint">{t("c.opening")}</p>}
       {err && <p className="err">{errText(err)}</p>}
     </Page>
@@ -95,7 +95,7 @@ function Detail({ a, onClose, onChanged, note, onPick, ask }: { a: Asset; onClos
   };
   return (
     <aside className="drawer">
-      <header><div><h3>{a.name}</h3><p>{a.path}</p></div><button className="icon" onClick={onClose} aria-label={t("c.close")}>✕</button></header>
+      <header><div><h3>{a.name}</h3><p>{a.path}</p></div><button className="icon" onClick={onClose} aria-label={t("c.close")} title={t("c.close")}><X /></button></header>
       <div className="compare">
         <figure><div className="frame"><Thumb a={a} /></div><figcaption>{t("d.current")}</figcaption></figure>
         {pick && <figure><div className="frame">{old ? <img src={old} /> : <span className="glyph">{t("d.no_preview")}</span>}</div><figcaption>{pick.hash} · {pick.when}</figcaption></figure>}
@@ -103,7 +103,7 @@ function Detail({ a, onClose, onChanged, note, onPick, ask }: { a: Asset; onClos
       <dl><dt>{t("d.type")}</dt><dd>{t(`k.${a.kind}` as Key)}</dd><dt>{t("d.size")}</dt><dd>{fmtBytes(a.size)}</dd><dt>{t("d.modified")}</dt><dd>{ago(a.mtime)}</dd></dl>
       <h4>{t("d.tags")}</h4>
       <div className="tags" data-t="tags">
-        {tags.map((x) => <span key={x}>{x}<button aria-label={t("d.remove_tag", { t: x })} onClick={() => save(tags.filter((y) => y !== x))}>×</button></span>)}
+        {tags.map((x) => <span key={x}>{x}<button aria-label={t("d.remove_tag", { t: x })} onClick={() => save(tags.filter((y) => y !== x))}><X s={10} /></button></span>)}
         <input value={draft} placeholder={a.tagged ? t("d.add_tag") : t("d.pending_tag")} onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && draft.trim()) { save([...tags, draft.trim().toLowerCase()]); setDraft(""); } }} />
       </div>
@@ -146,6 +146,7 @@ export default function App() {
   const [ask, setAsk] = useState<Ask | null>(null);
   const [sel, setSel] = useState<Asset | null>(null);
   const [busy, setBusy] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [drag, setDrag] = useState(false);
   const [err, setErr] = useState("");
   const [toast, setToast] = useState("");
@@ -156,6 +157,7 @@ export default function App() {
   const [pal, setPal] = useState<string | null>(null);
   const vaultRef = useRef<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const searchSeq = useRef(0);
   const note = (m: string) => { setToast(m); setTimeout(() => setToast(""), 4500); };
 
   const load = useCallback(async () => {
@@ -214,8 +216,13 @@ export default function App() {
     return () => { subs.forEach((s) => s.then((f) => f()).catch(() => {})); };
   }, [load]);
   useEffect(() => {
-    if (!q.trim()) return setResults(null);
-    const x = setTimeout(() => call<Asset[]>("search", { query: q }).then(setResults).catch((e) => setErr(String(e))), 300);
+    const query = q.trim();
+    if (!query) { searchSeq.current++; setResults(null); setSearching(false); return; }
+    const id = ++searchSeq.current;
+    setSearching(true);
+    const x = setTimeout(() => call<Asset[]>("search", { query })
+      .then((r) => { if (id !== searchSeq.current) return; setResults(r); setSearching(false); })
+      .catch((e) => { if (id !== searchSeq.current) return; setSearching(false); setErr(String(e)); }), 300);
     return () => clearTimeout(x);
   }, [q]);
   useEffect(() => {
@@ -328,11 +335,13 @@ export default function App() {
       </nav>
       <main>
         <div className="top">
-          <input ref={searchRef} data-t="search" className="search" value={q} onChange={(e) => { setQ(e.target.value); if (!q) setView("library"); }} placeholder={t("top.ph")} aria-label={t("top.ph")} />
-          {busy && <span className="pill"><i className="spin" />{t("c.working")}</span>}
+          <div className="searchwrap">
+            <input ref={searchRef} data-t="search" className="search" value={q} onChange={(e) => { setQ(e.target.value); if (!q) setView("library"); }} placeholder={t("top.ph")} aria-label={t("top.ph")} aria-busy={searching} />
+            {searching && <i className="spin" />}
+          </div>
           <button className="ghostb" onClick={() => setPal("")} title={t("top.actions_t")}>{t("top.actions")}</button>
         </div>
-        {err && <div className="banner" role="alert"><div><b>{t("err.title")}</b><span>{errText(err)}</span></div><button className="link" onClick={async () => note((await copy(err)) ? t("c.copied") : t("c.copy_fail"))}>{t("c.copy_details")}</button><button className="icon" onClick={() => setErr("")} aria-label={t("c.dismiss")}>✕</button></div>}
+        {err && <div className="banner" role="alert"><div><b>{t("err.title")}</b><span>{errText(err)}</span></div><button className="link" onClick={async () => note((await copy(err)) ? t("c.copied") : t("c.copy_fail"))}>{t("c.copy_details")}</button><button className="icon" onClick={() => setErr("")} aria-label={t("c.dismiss")} title={t("c.dismiss")}><X /></button></div>}
 
         {view === "overview" && !stats && <div className="cards" aria-busy="true">{[0, 1, 2, 3].map((k) => <div className="card" key={k}><span className="skel line" /><span className="skel big" /></div>)}</div>}
         {view === "overview" && stats && (
@@ -369,7 +378,7 @@ export default function App() {
             <div className="bar2">
               <div className="chips">{kinds.map((k) => <button key={k} className={k === kind ? "on" : ""} onClick={() => setKind(k)}>{kname(k)}</button>)}</div>
               <div className="tools"><select value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t("lib.sort")}><option value="recent">{t("lib.recent")}</option><option value="name">{t("lib.name")}</option><option value="size">{t("lib.largest")}</option></select>
-                <button className="icon" onClick={() => setDense(!dense)} aria-label={t("lib.layout")}>{dense ? "▦" : "☰"}</button></div>
+                <button className="icon" onClick={() => setDense(!dense)} aria-label={t("lib.layout")} title={t("lib.layout")}>{dense ? <Grid /> : <Rows />}</button></div>
             </div>
             {topTags.length > 0 && <div className="chips small">{tag && <button className="on" onClick={() => setTag("")}>{tag} ×</button>}
               {topTags.filter(([x]) => x !== tag).map(([x, n]) => <button key={x} onClick={() => setTag(x)}>{x} <em>{n}</em></button>)}</div>}
@@ -406,11 +415,12 @@ export default function App() {
       {sel && <Detail a={sel} onClose={() => setSel(null)} onChanged={load} note={note} onPick={() => setPicked(true)} ask={setAsk} />}
       {drag && <div className="drop"><div>{t("drop.title")}</div></div>}
       {toast && <div className="toast" role="status">{toast}</div>}
-      {ask && <Modal title={ask.title} onClose={() => setAsk(null)}><p>{ask.body}</p><div className="row end"><button className="ghostb" onClick={() => setAsk(null)}>{t("c.cancel")}</button><button className="primary" onClick={async () => { const a = ask; setAsk(null); try { await a.run(); } catch (e) { setErr(String(e)); } }}>{ask.label}</button></div></Modal>}
+      {ask && <Modal title={ask.title} onClose={() => setAsk(null)} footer={<><button className="ghostb" onClick={() => setAsk(null)}>{t("c.cancel")}</button><button className="primary" onClick={async () => { const a = ask; setAsk(null); try { await a.run(); } catch (e) { setErr(String(e)); } }}>{ask.label}</button></>}><p>{ask.body}</p></Modal>}
       {about && <About onClose={() => setAbout(false)} onLegal={() => setView("legal")} diag={diag} note={note} />}
-      {help && <Modal title={t("sc.title")} onClose={() => setHelp(false)}><dl className="kv keys"><dt><kbd>/</kbd></dt><dd>{t("sc.search")}</dd><dt><kbd>Ctrl</kbd> + <kbd>K</kbd></dt><dd>{t("sc.actions")}</dd><dt><kbd>?</kbd></dt><dd>{t("sc.show")}</dd><dt><kbd>Esc</kbd></dt><dd>{t("sc.close")}</dd><dt>{t("sc.drag")}</dt><dd>{t("sc.drag_d")}</dd></dl></Modal>}
+      {help && <Modal title={t("sc.title")} onClose={() => setHelp(false)} footer={<span className="mfoothint"><kbd>Esc</kbd> {t("sc.close")}</span>}>
+        <dl className="kv keys"><dt><kbd>/</kbd></dt><dd>{t("sc.search")}</dd><dt><kbd>Ctrl</kbd> + <kbd>K</kbd></dt><dd>{t("sc.actions")}</dd><dt><kbd>?</kbd></dt><dd>{t("sc.show")}</dd><dt><kbd>Esc</kbd></dt><dd>{t("sc.close")}</dd><dt>{t("sc.drag")}</dt><dd>{t("sc.drag_d")}</dd></dl></Modal>}
       {pal !== null && (
-        <div className="cmdbg" onClick={() => setPal(null)}><div className="cmd" onClick={(e) => e.stopPropagation()}>
+        <div className="palbg" onClick={() => setPal(null)}><div className="cmd" onClick={(e) => e.stopPropagation()}>
           <input autoFocus value={pal} onChange={(e) => setPal(e.target.value)} placeholder={t("pal.ph")} aria-label={t("pal.ph")}
             onKeyDown={(e) => { if (e.key === "Enter") { const m = cmds.find(([n]) => n.toLowerCase().includes(pal.toLowerCase())); if (m) { m[1](); setPal(null); } } }} />
           {cmds.filter(([n]) => n.toLowerCase().includes(pal.toLowerCase())).map(([n, f]) => <button key={n} onClick={() => { f(); setPal(null); }}>{n}</button>)}
