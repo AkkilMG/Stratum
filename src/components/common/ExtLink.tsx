@@ -6,9 +6,9 @@ export function ExtLink({ href, children }: { href: string; children: ReactNode 
     <a
       href={href}
       className='ext'
-      onClick={(e) => {
+onClick={(e) => {
         e.preventDefault();
-        openUrl(href).catch(() => window.open(href, '_blank'));
+        openUrl(href).catch(() => {});
       }}
     >
       {children}

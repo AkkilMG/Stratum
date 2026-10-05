@@ -10,6 +10,11 @@ use walkdir::WalkDir;
 #[cfg(windows)]
 use std::os::windows::process::CommandExt;
 
+/// Injected into the webview before the app bundle runs: no browser context menu (reload /
+/// inspect / view-source), no reload-print-devtools accelerators, no image drag-out. Only host
+/// behaviours are blocked, so the app's own shortcuts and `location.reload()` still work.
+const HARDEN: &str = include_str!("harden.js");
+
 type R<T> = Result<T, String>;
 fn e<E: ToString>(x: E) -> String { x.to_string() }
 const OLLAMA: &str = "http://localhost:11434";
@@ -583,16 +588,80 @@ async fn record_acceptance(version: String, user: String, app: AppHandle) -> R<(
 #[tauri::command]
 fn quit(app: AppHandle) { app.exit(0); }
 
+/// True only for our own document, so `on_navigation` can refuse anything that would unload the
+/// shell. Bundled builds serve from tauri://localhost (Linux/macOS) or wry's workaround URL
+/// http(s)://tauri.localhost (Windows); `tauri dev` serves from localhost. The handler also fires on
+/// the *initial* load, so both spellings have to be accepted or the app opens blank.
+fn is_app_url(u: &tauri::Url) -> bool {
+    let (scheme, host) = (u.scheme(), u.host_str().unwrap_or_default());
+    if cfg!(debug_assertions) && host == "localhost" {
+        return true;
+    }
+    (scheme == "tauri" && host == "localhost") || (matches!(scheme, "http" | "https") && host == "tauri.localhost")
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let _ = CACHE.set(app.path().app_local_data_dir().unwrap_or_else(|_| std::env::temp_dir()).join("vaults"));
+            // The window is declared in tauri.conf.json but marked `create: false`, so it is built here
+            // instead: config windows are created before this hook runs, and only the builder can
+            // attach an initialization script or deny navigation and new windows.
+            let conf = app.config().app.windows[0].clone();
+            tauri::WebviewWindowBuilder::from_config(app, &conf)?
+                .initialization_script(HARDEN)
+                .devtools(cfg!(debug_assertions))
+                .zoom_hotkeys_enabled(false)
+                .general_autofill_enabled(false)
+                .browser_extensions_enabled(false)
+                // Refuse any navigation away from our own document, but keep the initial load legal.
+                .on_navigation(is_app_url)
+                .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
+                .build()?;
             Ok(())
         })
         .manage(Vault::default())
         .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync, system_check, pull_model, set_author, create_hub, join_hub, record_acceptance, quit])
         .run(tauri::generate_context!())
         .expect("failed to run Stratum");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::is_app_url;
+
+    /// `on_navigation` also fires on the initial load, so a wrong answer here means a blank window
+    /// on one OS. Cover every spelling the bundled app and the dev server actually use.
+    #[test]
+    fn navigation_guard_allows_only_our_own_document() {
+        for ok in ["tauri://localhost/", "http://tauri.localhost/", "https://tauri.localhost/"] {
+            assert!(is_app_url(&ok.parse().unwrap()), "should allow {ok}");
+        }
+        for bad in [
+            "https://example.com/",
+            "https://arkynox.com/",
+            "about:blank",
+            "file:///C:/Windows/System32/cmd.exe",
+            "data:text/html,<h1>x</h1>",
+            "javascript:alert(1)",
+        ] {
+            assert!(!is_app_url(&bad.parse().unwrap()), "should refuse {bad}");
+        }
+    }
+
+    /// The vite dev server is only reachable in debug builds; a release build must not treat a
+    /// localhost page as one of ours.
+    #[test]
+    #[cfg(debug_assertions)]
+    fn dev_server_is_allowed_only_in_debug() {
+        assert!(is_app_url(&"http://localhost:1420/".parse().unwrap()));
+    }
+
+    #[test]
+    #[cfg(not(debug_assertions))]
+    fn dev_server_is_refused_in_release() {
+        assert!(!is_app_url(&"http://localhost:1420/".parse().unwrap()));
+    }
 }

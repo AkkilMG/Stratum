@@ -4,6 +4,10 @@
 :root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg)}button,select,input{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* Desktop shell: no stray text selection or image drag-out. Inherited, so portalled popups are covered too. */
+html,body{user-select:none;-webkit-user-select:none;-webkit-user-drag:none}
+/* ...but keep genuinely copyable content selectable: form fields, paths, license texts and legal docs. */
+input,textarea,[contenteditable],.path,pre,code,.doc,.lics{user-select:text;-webkit-user-select:text}
 .app{display:grid;grid-template-columns:236px 1fr;height:100vh}
 nav{background:var(--card);border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px;min-height:0}
 .brand{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;letter-spacing:-.02em;padding:4px 8px 20px}

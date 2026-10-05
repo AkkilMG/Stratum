@@ -11,12 +11,16 @@
   "app": {
     "windows": [
       {
+        "label": "main",
+        "create": false,
         "title": "Stratum",
         "width": 1360,
         "height": 860,
         "minWidth": 1000,
         "minHeight": 640,
-        "backgroundColor": "#0b1018"
+        "backgroundColor": "#0b1018",
+        "devtools": false,
+        "zoomHotkeysEnabled": false
       }
     ],
     "security": {
