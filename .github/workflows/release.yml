@@ -43,7 +43,7 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: "Stratum ${{ github.ref_name }}"
           releaseDraft: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: stratum-${{ matrix.os }}
           path: |
