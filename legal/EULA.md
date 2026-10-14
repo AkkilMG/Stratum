@@ -79,4 +79,4 @@ If any part of this Agreement is unenforceable, the rest remains in effect. This
 
 ## 15. Contact, feedback and reporting problems
 
-To report a bug, a vulnerability or any other issue, to give feedback, to recommend a feature, or to ask about these policies, write to support@arkynox.com. Please report security vulnerabilities privately to this address and allow us reasonable time to fix them before any public disclosure. For general contact, write to hello@arkynox.com. Website: https://arkynox.com
+To report a bug, a vulnerability or any other issue, to give feedback, to recommend a feature, or to ask about these policies, write to support@arkynox.com. Please report security vulnerabilities privately to this address and allow us reasonable time to fix them before any public disclosure. For general contact, write to contact@arkynox.com. Website: https://arkynox.com

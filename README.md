@@ -75,4 +75,4 @@ English (default), Spanish, Russian, Hindi, French and German, in a formal regis
 - Adding a language: copy `en.ts`, translate, then register it in `src/i18n.tsx` (`LANGS`, `D`).
 
 ## Contact
-Support, bugs, vulnerabilities, feedback, feature requests and policy questions: support@arkynox.com. General: hello@arkynox.com. Website: https://arkynox.com
+Support, bugs, vulnerabilities, feedback, feature requests and policy questions: support@arkynox.com. General: contact@arkynox.com. Website: https://arkynox.com

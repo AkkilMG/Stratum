@@ -12,7 +12,7 @@ Everything you store or manage with Stratum, including your files, tags, notes a
 
 Nothing through the Software. Stratum has no accounts, no telemetry, no analytics, no crash reporting and no advertising. Arkynox does not receive your files, tags, folder names, display name or usage data.
 
-If you write to us (for example at support@arkynox.com or hello@arkynox.com), we receive the details you send, such as your email address and message. We use them only to reply, to send necessary notices, security alerts and update information, and to deal with your request. We do not sell them, share them for advertising, or use them for any other purpose.
+If you write to us (for example at support@arkynox.com or contact@arkynox.com), we receive the details you send, such as your email address and message. We use them only to reply, to send necessary notices, security alerts and update information, and to deal with your request. We do not sell them, share them for advertising, or use them for any other purpose.
 
 ## 3. Remote storage by Arkynox
 
@@ -60,4 +60,4 @@ Stratum is a professional tool and is not directed to children.
 
 ## 11. Changes and contact
 
-If this policy changes materially, you will be asked to review it before continuing. For questions about this policy, to report a problem, or to send feedback, write to support@arkynox.com. For general contact, write to hello@arkynox.com.
+If this policy changes materially, you will be asked to review it before continuing. For questions about this policy, to report a problem, or to send feedback, write to support@arkynox.com. For general contact, write to contact@arkynox.com.
