@@ -47,7 +47,7 @@
       },
       "signCommand": {
         "cmd": "powershell",
-        "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "scripts/sign-windows.ps1", "%1"]
+        "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "../scripts/sign-windows.ps1", "%1"]
       },
       "nsis": {
         "headerImage": "installer/nsis-header.bmp",

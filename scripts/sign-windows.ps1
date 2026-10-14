@@ -24,8 +24,12 @@ $ErrorActionPreference = 'Stop'
 
 $certB64 = $env:WINDOWS_CERTIFICATE
 if ([string]::IsNullOrWhiteSpace($certB64)) {
-  Write-Host "WINDOWS_CERTIFICATE is not set - building an UNSIGNED artifact."
-  Write-Host "Set WINDOWS_CERTIFICATE (base64 .pfx) and WINDOWS_CERTIFICATE_PASSWORD to sign."
+  # Tauri runs this command once per signable file, so report once per build.
+  $stamp = Join-Path ([System.IO.Path]::GetTempPath()) 'stratum-unsigned-notice'
+  if (-not (Test-Path -LiteralPath $stamp) -or ((Get-Date) - (Get-Item -LiteralPath $stamp).LastWriteTime).TotalMinutes -ge 10) {
+    Write-Host "WINDOWS_CERTIFICATE is not set - building UNSIGNED artifacts. Set it (and WINDOWS_CERTIFICATE_PASSWORD) to sign."
+    Set-Content -LiteralPath $stamp -Value (Get-Date -Format o) -Encoding ASCII -ErrorAction SilentlyContinue
+  }
   exit 0
 }
 
