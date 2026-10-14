@@ -24,7 +24,7 @@ notify = "6"
 ureq = { version = "2", features = ["json"] }
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp"] }
 base64 = "0.22"
-resvg = "0.44"
+resvg = "0.48"
 psd = "0.3"
 
 [target.'cfg(windows)'.dependencies]
