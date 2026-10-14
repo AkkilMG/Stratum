@@ -33,7 +33,7 @@ jobs:
       - run: npm run icons
       # Windows signing is optional: scripts/sign-windows.ps1 is a no-op unless these secrets
       # are set, so the workflow still produces unsigned installers without a certificate.
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
