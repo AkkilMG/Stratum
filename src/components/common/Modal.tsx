@@ -14,7 +14,7 @@ export function Modal({ title, onClose, children, footer, wide }: { title: strin
         onClose();
       }
       if (e.key === 'Tab' && ref.current) {
-        const f = [...ref.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,summary,[tabindex]:not([tabindex=\"-1\"])')].filter(
+        const f = [...ref.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,summary,[tabindex]:not([tabindex="-1"])')].filter(
           (x) => !x.hasAttribute('disabled')
         );
         if (!f.length) return;

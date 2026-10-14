@@ -45,6 +45,10 @@
       "webviewInstallMode": {
         "type": "downloadBootstrapper"
       },
+      "signCommand": {
+        "cmd": "powershell",
+        "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "scripts/sign-windows.ps1", "%1"]
+      },
       "nsis": {
         "headerImage": "installer/nsis-header.bmp",
         "sidebarImage": "installer/nsis-sidebar.bmp",
@@ -67,10 +71,16 @@
         ]
       }
     },
-    "copyright": "© 2026 Arkynox. All rights reserved. Developed by Akkil M G.",
+    "copyright": "© 2026 Arkynox. Stratum is free and open source under the Stratum Community License. Developed by Akkil M G.",
     "resources": [
       "../THIRD_PARTY_NOTICES.txt",
-      "../LICENSE.txt"
+      "../LICENSE.txt",
+      "../NOTICE",
+      "../TRADEMARK.md",
+      "../legal/EULA.md",
+      "../legal/PRIVACY.md",
+      "../legal/EXTERNAL.md",
+      "../legal/OPEN_SOURCE.md"
     ]
   }
 }

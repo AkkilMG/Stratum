@@ -19,6 +19,11 @@ src-tauri/WixTools/
 *.deb
 *.rpm
 *.dmg
+dist-linux/
+
+# Test and coverage output
+coverage/
+*.lcov
 
 # Logs
 *.log
@@ -37,6 +42,7 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.vs/
 *.swp
 *.swo
 

@@ -1,0 +1,47 @@
+# Dependency vulnerability scanning. Runs on every change and weekly to catch newly
+# disclosed advisories in code that has not changed. Uses only the built-in GITHUB_TOKEN.
+name: security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: Rust (cargo audit)
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      issues: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit Rust dependencies
+        uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: src-tauri
+
+  npm:
+    name: npm (audit)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Audit shipped (production) dependencies
+        run: npm audit --omit=dev
+      - name: Audit all dependencies (informational)
+        run: npm audit
+        continue-on-error: true

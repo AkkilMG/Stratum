@@ -245,6 +245,9 @@ nav>button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width
 .aboutfacts{grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);gap:7px 14px;font-size:13px;margin:0}
 .aboutfacts dt{color:var(--mut);white-space:nowrap}.aboutfacts dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .aboutcopy{display:flex;align-items:center;gap:8px;line-height:1.4}
+.communitylinks{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px 18px}
+.communitylinks li{margin:0}
+.communitylinks-inline{margin:2px 0 0}
 @media(max-width:420px){.aboutfacts{grid-template-columns:auto minmax(0,1fr)}}
 @media(max-height:560px){
   .mdbg{padding:12px}.modal{max-height:calc(100dvh - 24px)}

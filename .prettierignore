@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-ssr/
+src-tauri/target/
+src-tauri/gen/
+src/licenses.json
+THIRD_PARTY_NOTICES.txt
+package-lock.json
+*.md
+src/styles/styles.css

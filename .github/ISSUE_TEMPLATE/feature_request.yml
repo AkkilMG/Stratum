@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an idea or improvement for Stratum
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Stratum! Please describe the idea as clearly as you can.
+  - type: checkboxes
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I searched existing issues and this has not been requested yet.
+          required: true
+  - type: textarea
+    attributes:
+      label: What problem does this solve?
+      description: Describe the problem or need. Example — "I'm always frustrated when..."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like
+      description: What would you like to happen?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Alternatives you've considered
+      description: Any other approaches or workarounds.
+  - type: dropdown
+    attributes:
+      label: How important is this to you?
+      options:
+        - Nice to have
+        - Important
+        - Blocking my workflow
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: Mockups, links or anything else that helps.

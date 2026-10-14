@@ -1,7 +1,8 @@
 STRATUM THIRD-PARTY NOTICES
-Stratum is a product of Arkynox (https://arkynox.com), developed by Akkil M G (https://github.com/AkkilMG).
+Stratum is free and open source software, a product of Arkynox (https://arkynox.com), developed by Akkil M G (https://github.com/AkkilMG).
+Repository: https://github.com/AkkilMG/Stratum  ·  License: Stratum Community License (see LICENSE.txt)
 Stratum includes the open-source components below. Each remains under its own license.
-Generated 2026-10-14T18:07:32.244Z
+Generated 2026-10-14T19:49:43.971Z
 
 ==============================================================================
 @tauri-apps/api 2.12.1  [npm]

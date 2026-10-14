@@ -3,33 +3,68 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "tauri": "tauri",
-    "icons": "tauri icon app-icon.png",
-    "licenses": "node scripts/gen-licenses.mjs"
-  },
-  "dependencies": {
-    "@tauri-apps/api": "^2.0.0",
-    "@tauri-apps/plugin-dialog": "^2.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "@tauri-apps/plugin-opener": "^2.0.0"
-  },
-  "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.0"
-  },
-  "description": "Stratum: local-first asset vault for game studios, by Arkynox",
+  "description": "Stratum: local-first, versioned, searchable asset vault for game studios. A product of Arkynox.",
   "author": {
     "name": "Akkil M G",
     "url": "https://github.com/AkkilMG"
   },
-  "homepage": "https://arkynox.com",
-  "license": "SEE LICENSE IN LICENSE.txt"
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "homepage": "https://github.com/AkkilMG/Stratum#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkkilMG/Stratum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AkkilMG/Stratum/issues"
+  },
+  "keywords": [
+    "asset-management",
+    "digital-asset-management",
+    "game-development",
+    "git",
+    "local-first",
+    "offline",
+    "tauri",
+    "version-control"
+  ],
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "tauri": "tauri",
+    "icons": "tauri icon app-icon.png",
+    "licenses": "node scripts/gen-licenses.mjs"
+  },
+  "overrides": {
+    "esbuild": "^0.25.0"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-dialog": "^2.0.0",
+    "@tauri-apps/plugin-opener": "^2.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.11.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.10.0",
+    "vite": "^7.3.7"
+  }
 }

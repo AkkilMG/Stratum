@@ -1,78 +1,101 @@
-# Stratum — local-first asset vault (Tauri 2 · Rust + React/TS)
+# Stratum
 
-**Stratum is a product of [Arkynox](https://arkynox.com). Developed by Akkil M G ([@AkkilMG](https://github.com/AkkilMG)).**
-© 2026 Arkynox. All rights reserved. See `LICENSE.txt`.
+**Local-first, versioned, searchable asset vault for game studios.**
 
-Prerequisites: Rust stable, Node 18+, Git (+ optional Git LFS), Tauri v2 OS deps (https://tauri.app/start/prerequisites/).
-Optional AI: `ollama pull llava:7b && ollama pull nomic-embed-text`.
+Stratum keeps every version of every texture, map, model and source file, finds assets by what they *look* like, and works fully offline. Nothing is uploaded to anyone's cloud.
 
-```
+Stratum is **free and open source — and it will stay that way.** The full source code is public and everyone is welcome to contribute, report bugs, request features and improve the documentation.
+
+[![CI](https://github.com/AkkilMG/Stratum/actions/workflows/ci.yml/badge.svg)](https://github.com/AkkilMG/Stratum/actions/workflows/ci.yml)
+[![License: Stratum Community](https://img.shields.io/badge/license-Stratum%20Community-2b50ff.svg)](LICENSE.txt)
+![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-98a3b3)
+[![Made with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg)](https://tauri.app)
+
+Repository: <https://github.com/AkkilMG/Stratum> · Website: <https://arkynox.com>
+
+---
+
+## Why Stratum
+
+Game studios generate thousands of assets. They get renamed, overwritten, lost and duplicated across drives. Stratum gives a studio one place to keep them:
+
+- **Every save is a version.** Files are versioned automatically in the background. No commits, no commands to learn.
+- **Search by meaning, not filenames.** Describe what you want ("red desert sector map") and find it, even if nothing is named that.
+- **Works offline.** Your working copy lives on your machine. Sync with a NAS or Git server when it is reachable.
+- **Your data stays yours.** No accounts, no telemetry, no cloud. Local AI only.
+- **Real previews.** Images, SVG vector maps and PSD files get thumbnails; the local AI suggests tags.
+
+## Features
+
+- Local-first asset vault with automatic background versioning (Git under the hood).
+- Visual grid and list views with previews for images, SVG maps and PSDs.
+- Keyword search plus semantic search using local embeddings.
+- Optional local AI tagging and search via [Ollama](https://ollama.com) (nothing leaves your machine).
+- Team sync through a shared bare Git repository on a NAS, LAN, VPN or WAN.
+- Conflict-safe: concurrent edits are kept side by side, never overwritten.
+- Six languages: English, Spanish, Russian, Hindi, French, German.
+- Available for Windows, macOS and Linux.
+
+## Screenshots
+
+> Add screenshots to `docs/` and link them here. Brand assets live in [`branding/`](branding/).
+
+## Install
+
+Prebuilt installers are published on the [releases page](https://github.com/AkkilMG/Stratum/releases).
+
+| Platform | Package |
+| --- | --- |
+| Windows | `.exe` setup (NSIS) or `.msi` |
+| Linux | `.deb`, `.rpm` or `.AppImage` |
+| macOS | `.dmg` (build from source — see below) |
+
+## Build from source
+
+**Prerequisites:** Rust (stable), Node.js 18+ (20 recommended), Git, and the [Tauri v2 system dependencies](https://tauri.app/start/prerequisites/) for your OS.
+Optional local AI: `ollama pull llava:7b && ollama pull nomic-embed-text`.
+
+```bash
+git clone https://github.com/AkkilMG/Stratum.git
+cd Stratum
 npm install
-npm run tauri icon path/to/square-logo.png   # generates src-tauri/icons (once)
-npm run tauri dev
-npm run tauri build
+npm run tauri dev      # run in development
+npm run tauri build    # build installers for your OS
 ```
-Open a folder: Stratum runs `git init`, indexes files, builds thumbnails, auto-commits on change, tags images with LLaVA
-and stores embeddings in `<vault>/.stratum/index.db`. Without Ollama everything works except semantic search (keyword fallback).
 
-Drag files or folders into the window to import them (copied to `Imported/`, then indexed and versioned automatically).
-SVG vector maps and PSD files get real thumbnails and AI tags. Use Git LFS for large binaries.
+Tauri builds installers for the OS it runs on. See [`docs/BUILDING.md`](docs/BUILDING.md) for platform notes and Linux packages via Docker, and the [build-installers workflow](.github/workflows/release.yml) for CI.
 
-## Where should assets live?
-- **This PC only**: simplest and fastest.
-- **This PC + NAS (recommended for teams)**: a local working copy for speed, plus a shared bare Git repository on the NAS (or any SSH/HTTPS Git server over LAN/VPN/WAN). Offline-safe; syncs in the background.
-- **Join**: clone an existing studio vault from the NAS.
-The index database and thumbnails always stay on the local machine (never on a network share). Folders on network drives are detected automatically and use polling plus a local git directory.
-Git LFS is opt-in: a plain NAS folder can't serve LFS objects.
+## How it works
 
-## Build installers
-Tauri builds installers for the OS it runs on, so build each platform on its own OS (or let CI do both).
+Open a folder and Stratum runs `git init`, indexes the files, builds thumbnails, auto-commits on change, tags images with LLaVA and stores embeddings in `<vault>/.stratum/index.db`. Without Ollama everything works except semantic search (keyword fallback).
 
-**Windows** (.exe setup + .msi), from the project root on Windows:
-```
-npm install
-npm run icons
-npm run tauri build
-```
-Output: `src-tauri\target\release\bundle\nsis\*.exe` and `...\msi\*.msi`.
+Drag files or folders into the window to import them (copied to `Imported/`, then indexed and versioned automatically). See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full picture.
 
-**Linux** (.deb, .rpm, .AppImage), on Ubuntu/Debian (or WSL with the project inside the Linux filesystem):
-```
-sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libgtk-3-dev build-essential curl
-npm install && npm run icons && npm run tauri build
-```
-Output: `src-tauri/target/release/bundle/{deb,rpm,appimage}/`.
+### Where should assets live?
 
-**Both at once:** push the project to GitHub and push a tag (`git tag v0.1.0 && git push --tags`) or run the
-"build-installers" workflow manually. Installers appear as a draft release and as downloadable artifacts.
+- **This PC only** — simplest and fastest.
+- **This PC + NAS (recommended for teams)** — a fast local working copy plus a shared bare Git repository on the NAS (or any SSH/HTTPS Git server over LAN/VPN/WAN). Offline-safe; syncs in the background.
+- **Join** — clone an existing studio vault.
 
-### Linux packages from a Windows PC (Docker)
-```
-docker build -f Dockerfile.linux -t stratum-linux .
-docker run --rm -v "%cd%\dist-linux:/out" stratum-linux      # PowerShell: -v "${PWD}\dist-linux:/out"
-```
-The `.deb`, `.rpm` and `.AppImage` appear in `dist-linux\`. Install on Ubuntu/Debian with `sudo apt install ./Stratum_0.1.0_amd64.deb`.
+The index database and thumbnails always stay on the local machine. Network drives are detected automatically and use polling plus a local git directory.
 
-## Legal, policies and licenses
-- `LICENSE.txt` / `legal/EULA.md`: Stratum End User License Agreement (shown in the NSIS installer and in the app).
-- `legal/PRIVACY.md`: privacy policy. Users must accept both before first use, and again whenever `POLICY_VERSION` in `src/legal.ts` changes (bump it and the "Version" lines in the documents together). Acceptance is recorded in `acceptance.json` in the app data folder.
-- `THIRD_PARTY_NOTICES.txt` and `src/licenses.json`: every shipped open-source dependency with its license files. Regenerate with `npm run licenses` (needs `cargo` and `npm install`). It runs automatically before every `tauri build`, so installers always carry the full list for their own platform.
-- Note: resvg/usvg and a few related crates are MPL-2.0 (unmodified). Git, Ollama and AI models are used but not bundled (see `legal/EXTERNAL.md`).
-- The legal text is a working draft. Have a qualified lawyer review the EULA and privacy policy (governing law, liability caps, commercial terms) before distributing commercially.
+## Contributing
 
-## Branding
-- `src-tauri/icons/` and `app-icon.png`: the Stratum app icon (rounded dark tile), generated for Windows (.ico), macOS (.icns) and Linux (PNG). Regenerate after changing `app-icon.png` with `npm run icons`.
-- `src/assets/`: logos used inside the app. The Stratum mark (small, transparent) and tile (large), Arkynox Studio logo in a light version (PNG) and a dark version (SVG). The app switches between them with the theme.
-- `src-tauri/installer/`: branded artwork for the NSIS and MSI installers.
-- `branding/`: clean transparent versions of the logos for marketing and docs (SVG and PNG), including the Arkynox Tech logo.
-- Splash screen: `src/Splash.tsx` (Arkynox first, then Stratum, about 3 seconds, skips on click or key, waits for the last space to open).
+All contributions are welcome — code, documentation, translations, bug reports and feature ideas. You do not need to be part of any team to help.
 
-## Languages
-English (default), Spanish, Russian, Hindi, French and German, in a formal register. The user picks a language on the very first screen, before any policy is shown, and can change it any time in Settings; the whole app updates instantly.
-- Dictionaries: `src/locales/*.ts`. `en.ts` is the source; the other files are type-checked against it, so a missing key fails the build. Keep `{placeholders}` identical.
-- The Summary tab of the policy gate is translated. The full License Agreement and Privacy Policy stay in English, which is the legally binding text (stated in the app).
-- Backend errors are sent as codes (`E:nas_down`) and translated in the UI.
-- Adding a language: copy `en.ts`, translate, then register it in `src/i18n.tsx` (`LANGS`, `D`).
+- Read [`CONTRIBUTING.md`](CONTRIBUTING.md) to get started.
+- Please follow our [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+- Report security issues privately as described in [`SECURITY.md`](SECURITY.md).
+- Browse [good first issues](https://github.com/AkkilMG/Stratum/labels/good%20first%20issue) if you are new.
 
-## Contact
-Support, bugs, vulnerabilities, feedback, feature requests and policy questions: support@arkynox.com. General: contact@arkynox.com. Website: https://arkynox.com
+When you modify Stratum, please clearly mark your version as a modification of Stratum and link back to this repository.
+
+## License
+
+Stratum is released under the **Stratum Community License**. In short: free to use, study, modify and share; not for resale; and forks must be honest about being modifications of Stratum. See [`LICENSE.txt`](LICENSE.txt) for the exact terms and [`TRADEMARK.md`](TRADEMARK.md) for brand usage.
+
+Stratum includes open-source components under their own licenses. See [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt) or the in-app **Licenses** screen.
+
+## Credits
+
+Stratum is a product of [Arkynox](https://arkynox.com), developed by [Akkil M G (@AkkilMG)](https://github.com/AkkilMG).

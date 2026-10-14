@@ -5,8 +5,8 @@ import { dateOf, useI18n, type Key } from "../../i18n";
 import mark from "../../assets/stratum-mark.png";
 
 type Lic = { generated: string; packages: { n: string; v: string; l: string; r: string; e: string; f: string[] }[]; texts: Record<string, string> };
-type Tab = "sum" | "eula" | "privacy" | "oss" | "external";
-const SUM: Key[] = ["s.1", "s.2", "s.3", "s.4", "s.5", "s.6", "s.7"];
+type Tab = "sum" | "eula" | "privacy" | "community" | "oss" | "external";
+const SUM: Key[] = ["s.1", "s.2", "s.3", "s.4", "s.5", "s.6", "s.7", "s.8"];
 
 export function Licenses() {
   const { t } = useI18n();
@@ -46,10 +46,34 @@ function Summary() {
     </div>
   );
 }
-function Panel({ tab }: { tab: Tab }) {
-  return tab === "sum" ? <Summary /> : tab === "eula" ? <Doc text={DOCS.eula} /> : tab === "privacy" ? <Doc text={DOCS.privacy} /> : tab === "external" ? <Doc text={DOCS.external} /> : <Licenses />;
+function Community() {
+  const { t } = useI18n();
+  const links: [string, string][] = [
+    [APP.repo, t("os.repo")],
+    [APP.contributing, t("os.contribute")],
+    [`${APP.issuesNew}/choose`, t("os.issues")],
+    [`${APP.issuesNew}/choose`, t("os.features")],
+    [APP.security, t("os.security")],
+    [APP.issues, t("os.discuss")],
+  ];
+  return (
+    <div className="doc community">
+      <p className="lead sm"><b>{t("os.free")}</b></p>
+      <p>{t("os.intro")}</p>
+      <h3>{t("os.license_h")}</h3>
+      <p>{t("os.license_d")}</p>
+      <p><ExtLink href={APP.repo}>{APP.repo}</ExtLink></p>
+      <h3>{t("os.welcome_h")}</h3>
+      <p>{t("os.welcome_d")}</p>
+      <ul className="communitylinks">{links.map(([href, label]) => (
+        <li key={label}><ExtLink href={href}>{label}</ExtLink></li>))}</ul>
+    </div>
+  );
 }
-const TABS: [Tab, Key][] = [["sum", "lg.sum"], ["eula", "lg.eula"], ["privacy", "lg.privacy"], ["oss", "lg.oss"], ["external", "lg.external"]];
+function Panel({ tab }: { tab: Tab }) {
+  return tab === "sum" ? <Summary /> : tab === "eula" ? <Doc text={DOCS.eula} /> : tab === "privacy" ? <Doc text={DOCS.privacy} /> : tab === "community" ? <Community /> : tab === "external" ? <Doc text={DOCS.external} /> : <Licenses />;
+}
+const TABS: [Tab, Key][] = [["sum", "lg.sum"], ["eula", "lg.eula"], ["privacy", "lg.privacy"], ["community", "lg.community"], ["oss", "lg.oss"], ["external", "lg.external"]];
 
 /** Shown before first use, and again whenever the policy version changes. */
 export function Gate({ onAccept, onDecline }: { onAccept: () => void; onDecline: () => void }) {

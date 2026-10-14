@@ -1,8 +1,8 @@
 ## Stratum Privacy Policy
 
-Version 2026-10-03.2
+Version 2026-10-15.1
 
-Stratum is a local-first application by Arkynox (https://arkynox.com). This policy explains what the Software does with information. The short version: your data stays with you.
+Stratum is a local-first, free and open-source application by Arkynox (https://arkynox.com). This policy explains what the Software does with information. The short version: your data stays with you.
 
 ## 1. Your data is yours
 
@@ -60,4 +60,4 @@ Stratum is a professional tool and is not directed to children.
 
 ## 11. Changes and contact
 
-If this policy changes materially, you will be asked to review it before continuing. For questions about this policy, to report a problem, or to send feedback, write to support@arkynox.com. For general contact, write to contact@arkynox.com.
+If this policy changes materially, you will be asked to review it before continuing. For questions about this policy, to report a problem, or to send feedback, use the repository at https://github.com/AkkilMG/Stratum, or write to support@arkynox.com. For general contact, write to contact@arkynox.com.

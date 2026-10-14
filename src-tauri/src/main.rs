@@ -17,6 +17,24 @@ const HARDEN: &str = include_str!("harden.js");
 
 type R<T> = Result<T, String>;
 fn e<E: ToString>(x: E) -> String { x.to_string() }
+/// Reduce a raw backend/git/network message to a stable code, so the UI can translate it and
+/// no file paths, host names or credentials from the underlying error reach the interface.
+fn err_code(msg: &str) -> &'static str {
+    let l = msg.trim().to_lowercase();
+    if l.is_empty() { "unknown" }
+    else if l.contains("timeout") || l.contains("timed out") || l.contains("deadline") { "timeout" }
+    else if l.contains("no such host") || l.contains("could not resolve") || l.contains("name or service not known") { "network_dns" }
+    else if l.contains("connection refused") || l.contains("connection reset") || l.contains("connection closed") { "network_conn" }
+    else if l.contains("permission denied") || l.contains("access denied") || l.contains("authentication failed") { "permission" }
+    else if l.contains("not found") || l.contains("no such file") || l.contains("does not exist") { "not_found" }
+    else if l.contains("enospc") || l.contains("no space") { "no_space" }
+    else if l.contains("out of memory") || l.contains("oom") { "oom" }
+    else if l.contains("merge") && l.contains("conflict") { "merge_conflict" }
+    else if l.contains("abort") { "merge_abort" }
+    else { "op_failed" }
+}
+/// Full `E:code` form for a top-level error returned to the UI.
+fn sanitize_err(msg: &str) -> String { format!("E:{}", err_code(msg)) }
 const OLLAMA: &str = "http://localhost:11434";
 static CACHE: OnceLock<PathBuf> = OnceLock::new();
 static AUTHOR: Mutex<String> = Mutex::new(String::new());
@@ -96,7 +114,7 @@ fn git_t(root: &Path, args: &[&str], secs: u64) -> (bool, String) {
 }
 fn emit_sync(app: &AppHandle, res: &R<String>) {
     let at = std::time::SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
-    let msg = match res { Ok(m) => m.clone(), Err(m) => m.clone() };
+    let msg = match res { Ok(m) => m.clone(), Err(m) => sanitize_err(m) };
     let _ = app.emit("sync-state", json!({"ok": res.is_ok(), "msg": msg, "at": at}));
 }
 
@@ -218,18 +236,50 @@ fn scan(root: &Path) -> R<()> {
     let all: Vec<String> = c.prepare("SELECT path FROM assets").map_err(e)?.query_map([], |r| r.get(0)).map_err(e)?.flatten().collect();
     for p in all { if !seen.contains(&p) { c.execute("DELETE FROM assets WHERE path=?1", [&p]).map_err(e)?; } }
     for (p, t) in &meta { let _ = c.execute("UPDATE assets SET tags=?1,tagged=0 WHERE path=?2 AND COALESCE(tags,'')!=?1", params![t, p]); }
+    prune_thumbs(root);
     Ok(())
+}
+
+/// Thumbnails are a disposable cache: drop ones whose asset is gone, then evict the oldest
+/// files once the cache exceeds a generous budget. Never touches vault files or history.
+fn prune_thumbs(root: &Path) {
+    const MAX_BYTES: u64 = 4 * 1024 * 1024 * 1024;
+    let dir = cache(root).join("thumbs");
+    let Ok(entries) = fs::read_dir(&dir) else { return };
+    let mut live = HashSet::new();
+    if let Ok(c) = db(root) {
+        if let Ok(mut s) = c.prepare("SELECT path FROM assets") {
+            if let Ok(m) = s.query_map([], |r| r.get::<_, String>(0)) {
+                for p in m.flatten() { live.insert(tpath(root, &p)); }
+            }
+        }
+    }
+    let mut files: Vec<(PathBuf, u64, std::time::SystemTime)> = Vec::new();
+    for ent in entries.flatten() {
+        let p = ent.path();
+        if !p.is_file() { continue; }
+        let Ok(md) = ent.metadata() else { continue };
+        if !live.contains(&p) { let _ = fs::remove_file(&p); continue; }
+        files.push((p, md.len(), md.modified().unwrap_or(UNIX_EPOCH)));
+    }
+    let mut total: u64 = files.iter().map(|f| f.1).sum();
+    if total <= MAX_BYTES { return; }
+    files.sort_by_key(|f| f.2);
+    for (p, len, _) in files {
+        if total <= MAX_BYTES { break; }
+        if fs::remove_file(&p).is_ok() { total = total.saturating_sub(len); }
+    }
 }
 
 // ---------- local AI (Ollama) ----------
 fn embed(text: &str) -> Option<Vec<f32>> {
-    let v: Value = ureq::post(&format!("{OLLAMA}/api/embed")).timeout(Duration::from_secs(30))
+    let v: Value = ureq::post(&format!("{OLLAMA}/api/embed")).timeout(Duration::from_secs(60))
         .send_json(json!({"model": "nomic-embed-text", "input": text})).ok()?.into_json().ok()?;
     serde_json::from_value(v["embeddings"][0].clone()).ok()
 }
 fn vision_tags(abs: &Path) -> Option<String> {
     let b = B64.encode(fs::read(abs).ok()?);
-    let v: Value = ureq::post(&format!("{OLLAMA}/api/generate")).timeout(Duration::from_secs(180)).send_json(json!({
+    let v: Value = ureq::post(&format!("{OLLAMA}/api/generate")).timeout(Duration::from_secs(300)).send_json(json!({
         "model": "llava:7b", "stream": false, "images": [b],
         "prompt": "Return a comma-separated list of 5 descriptive tags for this game asset. No conversational text."
     })).ok()?.into_json().ok()?;
@@ -415,22 +465,29 @@ fn commit_auto(root: &Path) {
 }
 fn svg_thumb(root: &Path, rel: &str) -> Option<()> {
     let data = fs::read(root.join(rel)).ok()?;
-    if data.len() > 30_000_000 { return None; }
+    let start = Instant::now();
     let tree = resvg::usvg::Tree::from_data(&data, &resvg::usvg::Options::default()).ok()?;
+    if start.elapsed().as_secs() > 30 { return None; }
     let s = tree.size();
+    // The output pixmap is always clamped to 360 px on its long edge, so the render cost is
+    // bounded even for very large canvases; the timeout covers pathologically complex files.
     let k = (360.0 / s.width().max(s.height())).min(4.0);
     let (w, h) = (((s.width() * k) as u32).max(1), ((s.height() * k) as u32).max(1));
     let mut pm = resvg::tiny_skia::Pixmap::new(w, h)?;
     pm.fill(resvg::tiny_skia::Color::WHITE);
     resvg::render(&tree, resvg::tiny_skia::Transform::from_scale(k, k), &mut pm.as_mut());
+    if start.elapsed().as_secs() > 30 { return None; }
     let img = image::RgbaImage::from_raw(w, h, pm.take())?;
     image::DynamicImage::ImageRgba8(img).to_rgb8().save(tpath(root, rel)).ok()
 }
 fn psd_thumb(root: &Path, rel: &str) -> Option<()> {
     let b = fs::read(root.join(rel)).ok()?;
-    if b.len() > 300_000_000 { return None; }
-    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+    // The psd crate decodes the whole document, so a malformed file can panic or allocate
+    // heavily; isolate it and keep a time budget, but never cap the asset's real size.
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Option<()> {
+        let start = Instant::now();
         let p = psd::Psd::from_bytes(&b).ok()?;
+        if start.elapsed().as_secs() > 60 { return None; }
         let img = image::RgbaImage::from_raw(p.width(), p.height(), p.rgba())?;
         image::DynamicImage::ImageRgba8(img).thumbnail(360, 360).to_rgb8().save(tpath(root, rel)).ok()
     })).unwrap_or(None)
@@ -452,13 +509,13 @@ async fn set_tags(path: String, tags: String, st: State<'_, Vault>) -> R<()> {
     export_tags(&r);
     Ok(())
 }
-#[tauri::command]
-async fn import_files(paths: Vec<String>, st: State<'_, Vault>) -> R<usize> {
-    let dest = root(&st)?.join("Imported");
-    fs::create_dir_all(&dest).map_err(e)?;
+/// Copies files/folders into `dest`, flattening each source's own name into the path and
+/// renaming on collision. Returns how many files were copied; the watcher indexes them.
+fn import_into(dest: &Path, paths: &[String]) -> R<usize> {
+    fs::create_dir_all(dest).map_err(e)?;
     let mut n = 0;
     for p in paths {
-        let src = PathBuf::from(&p);
+        let src = PathBuf::from(p);
         let base = src.parent().map(|x| x.to_path_buf()).unwrap_or_default();
         for ent in WalkDir::new(&src).into_iter().flatten().filter(|d| d.file_type().is_file()) {
             let rel = ent.path().strip_prefix(&base).unwrap_or(ent.path());
@@ -475,7 +532,11 @@ async fn import_files(paths: Vec<String>, st: State<'_, Vault>) -> R<usize> {
             n += 1;
         }
     }
-    Ok(n) // the file watcher indexes and commits the new files
+    Ok(n)
+}
+#[tauri::command]
+async fn import_files(paths: Vec<String>, st: State<'_, Vault>) -> R<usize> {
+    import_into(&root(&st)?.join("Imported"), &paths) // the file watcher indexes and commits the new files
 }
 #[tauri::command]
 async fn activity(st: State<'_, Vault>) -> R<Vec<Commit>> {
@@ -503,7 +564,7 @@ fn sync_inner(r: &Path) -> R<String> {
     commit_raw(r, "Save before sync");
     let b = git_out(r, &["rev-parse", "--abbrev-ref", "HEAD"]).1;
     let (ok, m) = git_t(r, &["fetch", "origin"], 90);
-    if !ok { return Err(format!("E:remote_down:{m}")); }
+    if !ok { return Err(format!("E:remote_down:{}", err_code(&m))); }
     let rb = format!("origin/{b}");
     let mut saved = 0;
     if git_out(r, &["rev-parse", "--verify", &rb]).0 {
@@ -523,10 +584,10 @@ fn sync_inner(r: &Path) -> R<String> {
         }
         let id = format!("user.name={}", author());
         let (ok, m) = git_out(r, &["-c", &id, "-c", "user.email=stratum@local", "merge", "--no-edit", "--allow-unrelated-histories", "-X", "ours", &rb]);
-        if !ok { git(r, &["merge", "--abort"]); return Err(format!("E:merge:{m}")); }
+        if !ok { git(r, &["merge", "--abort"]); return Err(format!("E:merge:{}", err_code(&m))); }
     }
-    let (ok, m) = git_t(r, &["push", "-u", "origin", &b], 3600);
-    if !ok { return Err(m); }
+    let (ok, m) = git_t(r, &["push", "-u", "origin", &b], 7200);
+    if !ok { return Err(sanitize_err(&m)); }
     Ok(if saved > 0 { format!("M:conflicts:{saved}") } else { "M:synced".into() })
 }
 #[tauri::command]
@@ -630,7 +691,156 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::is_app_url;
+    use super::*;
+
+    /// A fresh, unique directory under the OS temp dir so tests can run in parallel safely.
+    fn tmp_dir(tag: &str) -> PathBuf {
+        static N: AtomicU64 = AtomicU64::new(0);
+        let n = N.fetch_add(1, Ordering::SeqCst);
+        let ns = std::time::SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos();
+        let p = std::env::temp_dir().join(format!("stratum-test-{tag}-{}-{ns}-{n}", std::process::id()));
+        fs::create_dir_all(&p).unwrap();
+        p
+    }
+    /// Each vault has a private cache under the temp dir; remove both so tests leave nothing behind.
+    fn cleanup(root: &Path) {
+        let _ = fs::remove_dir_all(root);
+        let _ = fs::remove_dir_all(cache(root));
+    }
+
+    #[test]
+    fn err_code_maps_known_failures_and_defaults_safely() {
+        assert_eq!(err_code("fatal: unable to access ...: Operation timed out"), "timeout");
+        assert_eq!(err_code("ssh: Could not resolve hostname nas.local"), "network_dns");
+        assert_eq!(err_code("Connection refused by remote"), "network_conn");
+        assert_eq!(err_code("fatal: Authentication failed for 'https://example.com'"), "permission");
+        assert_eq!(err_code("No such file or directory"), "not_found");
+        assert_eq!(err_code("No space left on device"), "no_space");
+        assert_eq!(err_code("memory allocation of 1000000000 bytes failed: out of memory"), "oom");
+        assert_eq!(err_code("Automatic merge failed; fix conflicts"), "merge_conflict");
+        assert_eq!(err_code(""), "unknown");
+        assert_eq!(err_code("some brand new git failure we never saw"), "op_failed");
+    }
+
+    /// The whole point of sanitizing is that raw backend text never reaches the interface.
+    #[test]
+    fn sanitize_err_returns_only_a_stable_code() {
+        let leaky = r"fatal: could not read Username for 'https://token@github.com': No such device or address";
+        let out = sanitize_err(leaky);
+        assert!(out.starts_with("E:"), "should be a code: {out}");
+        assert!(!out.contains("github.com") && !out.contains("token"), "leaked raw text: {out}");
+        assert!(!out.contains('\\') && !out.contains('/'), "leaked a path: {out}");
+    }
+
+    #[test]
+    fn kind_is_driven_by_extension() {
+        let k = |n: &str| kind(Path::new(n));
+        assert_eq!(k("hero.PNG"), "Image");
+        assert_eq!(k("logo.svg"), "Vector");
+        assert_eq!(k("concept.psd"), "Source");
+        assert_eq!(k("dragon.fbx"), "Model");
+        assert_eq!(k("ambient.wav"), "Audio");
+        assert_eq!(k("readme.md"), "Other");
+        assert_eq!(k("no-extension"), "Other");
+    }
+
+    #[test]
+    fn ignored_covers_editor_and_temp_churn() {
+        for n in ["file~", "a.tmp", "b.swp", "x.lock", ".stratum-tags.json", "Thumbs.db", ".DS_Store", "~$doc"] {
+            assert!(ignored(n), "{n} should be ignored");
+        }
+        for n in ["texture.png", "map.tga", "notes.txt"] {
+            assert!(!ignored(n), "{n} should NOT be ignored");
+        }
+    }
+
+    #[test]
+    fn cosine_scores_expected_similarity() {
+        assert!((cosine(&[1.0, 0.0], &[1.0, 0.0]) - 1.0).abs() < 1e-6);
+        assert!(cosine(&[1.0, 0.0], &[0.0, 1.0]).abs() < 1e-6);
+        assert_eq!(cosine(&[1.0], &[1.0, 2.0]), 0.0, "length mismatch is 0");
+        assert_eq!(cosine(&[], &[]), 0.0);
+    }
+
+    #[test]
+    fn parse_commits_reads_the_separator_format() {
+        let raw = b"abc123\x1fMaya Chen\x1f2 minutes ago\x1fAdd hero texture\ndef456\x1fSam\x1f1 day ago\x1fUpdate map";
+        let c = parse_commits(raw);
+        assert_eq!(c.len(), 2);
+        assert_eq!(c[0].hash, "abc123");
+        assert_eq!(c[0].author, "Maya Chen");
+        assert_eq!(c[0].msg, "Add hero texture");
+        assert_eq!(c[1].msg, "Update map");
+        assert!(parse_commits(b"garbage without separators").is_empty());
+    }
+
+    /// End-to-end over the real indexer: files get indexed, shared tags are applied, a generated
+    /// thumbnail is written for images, `.git` is skipped, and deletions are picked up.
+    #[test]
+    fn scan_indexes_applies_tags_and_reconciles_deletes() {
+        let dir = tmp_dir("scan");
+        fs::write(dir.join("notes.txt"), b"hello").unwrap();
+        fs::write(dir.join(".stratum-tags.json"), br#"{"notes.txt":"character, blue"}"#).unwrap();
+        let img = image::RgbImage::from_pixel(16, 16, image::Rgb([200, 100, 50]));
+        img.save(dir.join("tile.png")).unwrap();
+        fs::create_dir_all(dir.join(".git")).unwrap();
+        fs::write(dir.join(".git").join("config"), b"should be skipped").unwrap();
+
+        scan(&dir).unwrap();
+
+        let c = db(&dir).unwrap();
+        let tags: String = c.query_row("SELECT COALESCE(tags,'') FROM assets WHERE path='notes.txt'", [], |r| r.get(0)).unwrap();
+        assert_eq!(tags, "character, blue", "shared tags should reach the index");
+        let kind: String = c.query_row("SELECT kind FROM assets WHERE path='tile.png'", [], |r| r.get(0)).unwrap();
+        assert_eq!(kind, "Image");
+        assert!(tpath(&dir, "tile.png").exists(), "an image should get a cached thumbnail");
+        let in_git: i64 = c.query_row("SELECT COUNT(*) FROM assets WHERE path LIKE '.git/%'", [], |r| r.get(0)).unwrap();
+        assert_eq!(in_git, 0, "the .git directory must never be indexed");
+
+        fs::remove_file(dir.join("notes.txt")).unwrap();
+        scan(&dir).unwrap();
+        let left: i64 = c.query_row("SELECT COUNT(*) FROM assets WHERE path='notes.txt'", [], |r| r.get(0)).unwrap();
+        assert_eq!(left, 0, "a removed file should be dropped from the index");
+        drop(c);
+        cleanup(&dir);
+    }
+
+    #[test]
+    fn import_into_copies_nested_files_and_renames_collisions() {
+        let dir = tmp_dir("import");
+        let src = dir.join("src").join("inner");
+        fs::create_dir_all(&src).unwrap();
+        fs::write(src.join("a.txt"), b"one").unwrap();
+        let dest = dir.join("vault").join("Imported");
+
+        let source = src.join("a.txt").to_string_lossy().to_string();
+        assert_eq!(import_into(&dest, std::slice::from_ref(&source)).unwrap(), 1);
+        assert_eq!(fs::read_to_string(dest.join("a.txt")).unwrap(), "one");
+
+        assert_eq!(import_into(&dest, std::slice::from_ref(&source)).unwrap(), 1);
+        assert_eq!(fs::read_to_string(dest.join("a-1.txt")).unwrap(), "one", "second copy is renamed, nothing overwritten");
+        cleanup(&dir);
+    }
+
+    #[test]
+    fn prune_thumbs_drops_orphans_and_keeps_live_ones() {
+        let dir = tmp_dir("prune");
+        let live = tpath(&dir, "keep.png");
+        let orphan = tpath(&dir, "gone.png");
+        fs::create_dir_all(live.parent().unwrap()).unwrap();
+        fs::write(&live, b"thumb").unwrap();
+        fs::write(&orphan, b"thumb").unwrap();
+        // An asset row makes its thumbnail "live"; the other file becomes an orphan.
+        let c = db(&dir).unwrap();
+        c.execute("INSERT INTO assets(path,name,kind,size,mtime) VALUES('keep.png','keep.png','Image',1,1)", []).unwrap();
+        drop(c);
+
+        prune_thumbs(&dir);
+
+        assert!(live.exists(), "thumbnails for known assets must survive");
+        assert!(!orphan.exists(), "orphaned thumbnails must be removed");
+        cleanup(&dir);
+    }
 
     /// `on_navigation` also fires on the initial load, so a wrong answer here means a blank window
     /// on one OS. Cover every spelling the bundled app and the dev server actually use.

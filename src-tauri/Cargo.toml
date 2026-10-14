@@ -5,6 +5,7 @@ edition = "2021"
 description = "Stratum: local-first, versioned, searchable asset management for game studios. A product of Arkynox."
 authors = ["Akkil M G (https://github.com/AkkilMG)"]
 homepage = "https://arkynox.com"
+repository = "https://github.com/AkkilMG/Stratum"
 license-file = "../LICENSE.txt"
 publish = false
 

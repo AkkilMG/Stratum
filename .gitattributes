@@ -1,0 +1,28 @@
+# Normalize line endings to LF in the repository, regardless of platform.
+* text=auto eol=lf
+
+# Windows scripts keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets (never diff or convert these).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.bmp binary
+*.pdf binary
+*.db binary
+*.sqlite binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+
+# Generated files.
+src/licenses.json linguist-generated=true
+THIRD_PARTY_NOTICES.txt linguist-generated=true
+package-lock.json linguist-generated=true

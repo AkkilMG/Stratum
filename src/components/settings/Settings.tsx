@@ -31,10 +31,14 @@ export function About({ onClose, onLegal, diag, note }: { onClose: () => void; o
         <dl className="aboutfacts">
           <dt>{t("ab.product_of")}</dt><dd><ExtLink href={APP.site}>Arkynox</ExtLink></dd>
           <dt>{t("ab.dev_by")}</dt><dd>{APP.developer} · <ExtLink href={APP.github}>@AkkilMG</ExtLink></dd>
+          <dt>{t("ab.repo")}</dt><dd><ExtLink href={APP.repo}>github.com/AkkilMG/Stratum</ExtLink></dd>
           <dt>{t("ab.website")}</dt><dd><ExtLink href={APP.site}>arkynox.com</ExtLink></dd>
           <dt>{t("ab.support")}</dt><dd><ExtLink href={`mailto:${APP.support}`}>{APP.support}</ExtLink></dd>
         </dl>
-        <p className="hint aboutcopy"><ArkLogo height={18} />{t("ab.copy", { y: APP.year })}</p>
+        <p className="hint communitylinks-inline">
+          <ExtLink href={APP.contributing}>{t("ab.contribute")}</ExtLink> · <ExtLink href={APP.issues}>{t("ab.issues")}</ExtLink>
+        </p>
+        <p className="hint aboutcopy"><ArkLogo height={18} />{t("ab.open", { y: APP.year })}</p>
       </div>
     </Modal>
   );
@@ -150,6 +154,16 @@ export function Settings(p: P) {
             </div>
           </Panel>
         </div>
+      </Band>
+
+      <Band title={t("s.community")} icon={<Globe />}>
+        <Panel hint={t("s.community_d")}>
+          <div className="checks">
+            <div className="crow"><i className="pico"><Info /></i><div><b><ExtLink href={APP.repo}>{t("s.repo")}</ExtLink></b><small>github.com/AkkilMG/Stratum</small></div></div>
+            <div className="crow"><i className="pico"><LifeBuoy /></i><div><b><ExtLink href={APP.contributing}>{t("s.contribute")}</ExtLink></b><small>{t("s.report_bug")} · {t("s.request_feature")}</small></div></div>
+            <div className="crow"><i className="pico"><Info /></i><div><b><ExtLink href={APP.security}>{t("s.security")}</ExtLink></b><small>{t("os.security")}</small></div></div>
+          </div>
+        </Panel>
       </Band>
     </div>
   );

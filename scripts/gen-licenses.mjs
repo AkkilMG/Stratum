@@ -57,9 +57,9 @@ for (const id of need) {
 }
 
 pkgs.sort((a, b) => a.n.localeCompare(b.n) || a.v.localeCompare(b.v));
-const out = pkgs.map(({ d, ...p }) => p);
+const out = pkgs.map(({ d: _d, ...p }) => p);
 fs.writeFileSync("src/licenses.json", JSON.stringify({ generated: new Date().toISOString(), packages: out, texts }));
-let n = `STRATUM THIRD-PARTY NOTICES\nStratum is a product of Arkynox (https://arkynox.com), developed by Akkil M G (https://github.com/AkkilMG).\nStratum includes the open-source components below. Each remains under its own license.\nGenerated ${new Date().toISOString()}\n`;
+let n = `STRATUM THIRD-PARTY NOTICES\nStratum is free and open source software, a product of Arkynox (https://arkynox.com), developed by Akkil M G (https://github.com/AkkilMG).\nRepository: https://github.com/AkkilMG/Stratum  ·  License: Stratum Community License (see LICENSE.txt)\nStratum includes the open-source components below. Each remains under its own license.\nGenerated ${new Date().toISOString()}\n`;
 for (const p of out) {
   n += `\n${"=".repeat(78)}\n${p.n} ${p.v}  [${p.e}]\nLicense: ${p.l}\n${p.r ? "Source: " + p.r + "\n" : ""}\n`;
   n += p.f.length ? p.f.map((h) => texts[h].trim()).join("\n\n---\n\n") : "(License text not found in package. See the source link above.)";

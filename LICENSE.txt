@@ -1,84 +1,168 @@
-Stratum End User License Agreement
+Stratum Community License
+Version 1.0 (2026-10-15)
 
-Version 2026-10-03.2
+Copyright (C) 2026 Arkynox (https://arkynox.com). Stratum is developed by
+Akkil M G (https://github.com/AkkilMG). All rights reserved.
 
-Stratum (the "Software") is a product of Arkynox (https://arkynox.com), developed by Akkil M G (https://github.com/AkkilMG). "Arkynox", "we" and "us" mean the owner of the Software. "You" means the person or organization that installs or uses it.
+This document is a license, not a contract of sale. It sets out the terms on
+which you may use, study, modify and share Stratum (the "Software"). It is
+published to keep Stratum free and open, and it is not an approval-required
+agreement. By using, copying, modifying or distributing the Software you agree
+to these terms. If you do not agree, do not use the Software.
 
-1. Acceptance
+The original repository is https://github.com/AkkilMG/Stratum.
 
-By clicking "I agree" or by installing or using the Software you accept this Agreement. If you accept for an organization, you confirm you have authority to bind it. If you do not agree, do not use the Software.
 
-2. License grant
+1. DEFINITIONS
 
-The Software is licensed, not sold. Subject to this Agreement and to any order, invoice or written agreement with Arkynox that defines your permitted seats or term, Arkynox grants you a non-exclusive, non-transferable, non-sublicensable, revocable license to install and use the Software on devices you own or control, for your internal business or personal purposes.
+"You" means the individual or legal entity exercising the rights under this
+license. "We", "us", "the owner" and "Arkynox" mean the owner of the Software.
+"Source" means the preferred form of the Software for making modifications.
+"Derivative Work" means any work based on or incorporating the Software, in
+whole or in part, including modified copies. "Distribute" means to share,
+publish, convey or otherwise make the Software available to a third party.
+"Official version" means a release distributed by the owner through its official
+channels.
 
-3. Restrictions
 
-You may not: (a) copy, modify or distribute the Software except as this Agreement allows; (b) reverse engineer, decompile or disassemble it, except to the extent applicable law permits despite this restriction; (c) sell, rent, lease, sublicense or provide it as a hosted service to others; (d) remove or alter ownership, copyright or license notices; (e) use it to break the law or infringe the rights of others.
+2. GRANT OF RIGHTS
 
-4. Ownership
+Subject to the conditions in section 3, we grant you a worldwide, royalty-free,
+non-exclusive, perpetual license to:
 
-Arkynox owns the Software, its design, branding and documentation, and all related intellectual property. Nothing in this Agreement transfers ownership to you. The names "Stratum" and "Arkynox" and their logos are marks of Arkynox.
+  (a) use and run the Software for any lawful purpose, including personal,
+      academic, non-profit and commercial use;
+  (b) read, study and use the Source to learn how the Software works;
+  (c) copy the Software;
+  (d) modify the Software and create Derivative Works; and
+  (e) distribute copies of the Software and Derivative Works, in Source or
+      binary form.
 
-5. Your data belongs to you
+No fee is payable to us for any of these rights. Stratum is free of charge and
+is intended to remain free of charge forever.
 
-All data you store, create, import or manage with Stratum, including files, tags, notes and version history ("Your Content"), is owned by you or your organization. Arkynox claims no ownership of it and no license to it. Stratum processes Your Content on devices and storage under your control, such as your computer, your NAS or your own Git server. Arkynox does not receive, host or have access to Your Content, and is not responsible for it, including its legality, accuracy, availability, security or loss. You are responsible for the security of your devices, accounts, networks and servers.
 
-If Arkynox ever stores any data remotely, that data will be encrypted and secured, will be stored only with your clear opt-in, and will be described in the Privacy Policy before the feature is used. Arkynox uses contact details you give us only to send necessary notices, security alerts, update information and replies to your requests. We do not use Your Content or your information for any other purpose, and we do not sell it.
+3. CONDITIONS
 
-6. Backups and your responsibility
+The rights in section 2 are granted only if you meet all of the following.
 
-Stratum keeps version history to help you recover earlier files, but it is not a backup system. Version history stored on the same disk as your working files can be lost with that disk. You are responsible for keeping independent backups of anything you cannot afford to lose, and for reviewing the results of sync, restore and import operations.
+  (a) Attribution. You must keep this license, the copyright notice above, and
+      any other notices in the Software. You must give appropriate credit to the
+      project and link to the original repository. When you distribute the
+      Software or a Derivative Work, you must include a copy of this license.
 
-7. Security and software integrity
+  (b) Marking of modifications. A Derivative Work must be clearly marked as
+      modified, must carry a prominent notice that it is "a modification of
+      Stratum" (or an accurate equivalent), and must link to the original
+      repository at https://github.com/AkkilMG/Stratum. You must state the date
+      of your modifications. You may not remove or obscure this information.
 
-Arkynox takes reasonable care to ensure that Stratum, as published by Arkynox through its official channels (https://arkynox.com), does not contain malware or viruses. No software is free of defects, and Arkynox does not promise that Stratum will be free of every bug or vulnerability. Arkynox does not guarantee, and is not responsible for, copies of Stratum obtained from any other source, or for modified, repackaged or third-party-distributed versions. Download and install Stratum only from official Arkynox sources.
+  (c) No clone-and-rename / no passing off. You may not rebrand, rename or
+      present a Derivative Work in a way that suggests it is the original
+      Stratum, an official release, or endorsed, sponsored or approved by the
+      owner, when it is not. You may not use the names "Stratum" or "Arkynox",
+      their logos, or names and marks that are confusingly similar, to market or
+      distribute a Derivative Work.
 
-8. Third-party and open-source software
+  (d) No resale. You may not sell, rent, lease, sublicense for a fee, or
+      otherwise charge a fee for the Software itself or for a Derivative Work as
+      a product or paid service. You may freely distribute the Software and
+      Derivative Works at no charge. This does not prevent you from charging for
+      your own separate work (such as installation, integration, support, or a
+      larger product of which the Software is only a part) provided the Software
+      itself is not the thing being sold and all other conditions are met.
 
-The Software includes third-party and open-source components. Each is licensed under its own terms, listed in the Open-source licenses section of the Software and in the file THIRD_PARTY_NOTICES.txt. Those terms apply to those components, and nothing in this Agreement limits your rights under them. Some components, such as resvg, are licensed under MPL-2.0; Arkynox has not modified them, and their source code is available from their authors.
+  (e) Compliance. You must comply with all laws that apply to you and must not
+      use the Software to break the law or infringe the rights of others.
 
-The optional local AI features use software you install separately, such as Ollama, and models you choose to download. Those are governed by their own licenses, which you are responsible for reviewing and following. Arkynox does not guarantee software, models or services provided by third parties.
+  (f) Third-party components. The Software includes third-party and open-source
+      components licensed under their own terms. Those terms apply to those
+      components and nothing in this license limits your rights under them. See
+      THIRD_PARTY_NOTICES.txt and the "Open-source licenses" section of the
+      Software.
 
-9. Updates
 
-Arkynox may provide updates or new versions, which are covered by this Agreement unless they come with different terms. Arkynox has no obligation to provide support or updates unless stated in a separate written agreement.
+4. TRADEMARKS
 
-10. Disclaimer of warranty
+The names "Stratum" and "Arkynox" and the associated logos are trademarks of
+the owner. This license does not grant you any right to use them except as
+necessary to give the credit and notices required by section 3.
 
-To the maximum extent permitted by law, the Software is provided "as is" and "as available", without warranties of any kind, whether express, implied or statutory, including merchantability, fitness for a particular purpose, non-infringement, and uninterrupted or error-free operation. AI-generated tags and search results may be inaccurate and should be reviewed by you.
 
-11. Limitation of liability
+5. CONTRIBUTIONS
 
-To the maximum extent permitted by law, Arkynox and its developers will not be liable for any indirect, incidental, special, consequential or punitive damages, or for loss of data, profits, revenue or business, arising from or related to the Software, even if advised of the possibility. Arkynox's total liability for any claim is limited to the amount you paid for the Software in the twelve months before the claim, or to INR 8,000 if you paid nothing. Some jurisdictions do not allow certain limits, so parts of this section may not apply to you.
+If you submit a contribution (code, documentation, translations, artwork, or
+anything else) to the project, you keep the copyright in your contribution and
+you grant the owner a worldwide, royalty-free, perpetual, irrevocable license to
+use, reproduce, modify, distribute and relicense your contribution as part of
+the Software and its Derivative Works. You confirm that you have the right to
+grant this.
 
-12. Termination
 
-This Agreement lasts until terminated. It ends automatically if you breach it. You may end it at any time by uninstalling the Software and destroying your copies. Sections 4, 5, 6, 7, 10, 11 and 13 survive termination.
+6. FUTURE VERSIONS AND POLICY CHANGES
 
-13. Governing law and applicable laws
+The owner may publish updated versions of this license and may change the
+license, policies or terms for future releases of the Software. Each release is
+governed by the license published with that release. Changes do not apply
+retroactively to copies already distributed under an earlier version. Continued
+use of a later release means you accept the terms published with it.
 
-This Agreement is governed by the laws of India, and Indian law takes priority over the laws of any other country. Arkynox complies with the laws that apply to it, including, as applicable:
 
-- the Information Technology Act, 2000 and the rules made under it, including the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules, 2011;
-- the Digital Personal Data Protection Act, 2023 and the rules made under it;
-- the Indian Contract Act, 1872;
-- the Copyright Act, 1957 and the Trade Marks Act, 1999;
-- the Consumer Protection Act, 2019, where it applies;
-- the Arbitration and Conciliation Act, 1996;
-- the directions of the Indian Computer Emergency Response Team (CERT-In) on reporting cyber security incidents;
-- Indian export control and sanctions requirements, including the Foreign Trade (Development and Regulation) Act, 1992.
+7. TERMINATION
 
-You must comply with the laws that apply to you and to Your Content in the place where you use Stratum, for example data protection laws such as the EU or UK GDPR or the California Consumer Privacy Act, where they apply to your own use. Because Arkynox does not collect your data through Stratum, most such duties rest with you as the owner of Your Content. If a law of your country gives you rights that cannot be waived, those rights apply to the extent the law requires, and the rest of this Agreement still applies.
+This license ends automatically if you breach any condition in section 3, if you
+do not cure the breach within 30 days after receiving written notice of it, or
+immediately for a breach that cannot be cured. On termination you must stop
+using and distributing the Software and Derivative Works, except that copies
+already lawfully distributed to others remain governed by this license. Sections
+4, 5, 7, 9, 10 and 11 survive termination.
 
-Disputes are first to be raised in good faith by writing to support@arkynox.com. If they are not resolved, the courts of competent jurisdiction in India have exclusive jurisdiction, unless the parties agree in writing to arbitration under the Arbitration and Conciliation Act, 1996.
 
-14. General
+8. NO WARRANTY
 
-If any part of this Agreement is unenforceable, the rest remains in effect. This Agreement, together with any signed order or agreement with Arkynox, is the entire agreement about the Software. Arkynox may update this Agreement for new versions; you will be asked to accept material changes before continuing.
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY
+KIND, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND UNINTERRUPTED OR ERROR-FREE
+OPERATION. YOU USE THE SOFTWARE AT YOUR OWN RISK. AI-GENERATED TAGS AND SEARCH
+RESULTS MAY BE INACCURATE AND SHOULD BE REVIEWED BY YOU. THE OWNER DOES NOT
+GUARANTEE THAT ANY COPY OBTAINED FROM ANY OTHER SOURCE IS COMPLETE OR FREE OF
+MALWARE.
 
-15. Contact, feedback and reporting problems
 
-To report a bug, a vulnerability or any other issue, to give feedback, to recommend a feature, or to ask about these policies, write to support@arkynox.com. Please report security vulnerabilities privately to this address and allow us reasonable time to fix them before any public disclosure. For general contact, write to contact@arkynox.com. Website: https://arkynox.com
+9. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE OWNER AND ITS DEVELOPERS WILL NOT BE
+LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES,
+OR FOR LOSS OF DATA, PROFITS, REVENUE OR BUSINESS, ARISING FROM OR RELATED TO
+THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY. THE OWNER'S TOTAL LIABILITY FOR
+ANY CLAIM IS LIMITED TO THE AMOUNT YOU PAID FOR THE SOFTWARE IN THE TWELVE MONTHS
+BEFORE THE CLAIM, OR TO INR 8,000 IF YOU PAID NOTHING. SOME JURISDICTIONS DO NOT
+ALLOW CERTAIN LIMITS, SO PARTS OF THIS SECTION MAY NOT APPLY TO YOU.
+
+
+10. YOUR DATA
+
+All data you store, create, import or manage with the Software is owned by you
+or your organization. The owner claims no ownership of it and no license to it.
+The Software processes your data on devices and storage under your control.
+
+
+11. GOVERNING LAW
+
+This license is governed by the laws of India, which take priority over the laws
+of any other country. Disputes are first to be raised in good faith by writing to
+contact@arkynox.com. If they are not resolved, the courts of competent
+jurisdiction in India have exclusive jurisdiction, unless the parties agree in
+writing to arbitration under the Arbitration and Conciliation Act, 1996.
+
+
+12. CONTACT
+
+Bugs, issues, feature requests and contributions:
+https://github.com/AkkilMG/Stratum
+
+Support: support@arkynox.com
+General: contact@arkynox.com
+Website: https://arkynox.com
 
 Third-party components are licensed separately. See THIRD_PARTY_NOTICES.txt.
