@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { getVersion } from "@tauri-apps/api/app";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 import { call } from "../../services/api";
 import { APP, getAcceptance } from "../../config/legal";
 import { ArkLogo, Copy, Cpu, Drive, ExtLink, Globe, Info, LangPicker, LifeBuoy, Mail, Modal, Palette, Refresh, User } from "../common";
@@ -41,6 +43,45 @@ export function About({ onClose, onLegal, diag, note }: { onClose: () => void; o
         <p className="hint aboutcopy"><ArkLogo height={18} />{t("ab.open", { y: APP.year })}</p>
       </div>
     </Modal>
+  );
+}
+
+/** Checks the signed release feed (latest.json) and installs in place. No-op feedback in dev/browser. */
+function Updates() {
+  const { t } = useI18n();
+  const [ver, setVer] = useState("");
+  const [st, setSt] = useState<"idle" | "checking" | "available" | "uptodate" | "downloading" | "ready" | "error">("idle");
+  const [next, setNext] = useState("");
+  const [pct, setPct] = useState(0);
+  useEffect(() => { getVersion().then(setVer).catch(() => setVer("0.1.0")); }, []);
+  const find = async () => {
+    setSt("checking");
+    try { const u = await check(); if (u) { setNext(u.version); setSt("available"); } else { setSt("uptodate"); } }
+    catch { setSt("error"); }
+  };
+  const install = async () => {
+    setPct(0); setSt("downloading");
+    try {
+      const u = await check();
+      if (!u) { setSt("uptodate"); return; }
+      let total = 0, got = 0;
+      await u.downloadAndInstall((ev) => {
+        if (ev.event === "Started") total = ev.data.contentLength ?? 0;
+        else if (ev.event === "Progress") { got += ev.data.chunkLength; setPct(total ? Math.min(100, Math.round((got / total) * 100)) : 0); }
+      });
+      setSt("ready");
+    } catch { setSt("error"); }
+  };
+  const status = st === "checking" ? t("up.checking") : st === "available" ? t("up.available", { v: next }) : st === "uptodate" ? t("up.uptodate") : st === "downloading" ? t("up.progress", { n: pct }) : st === "ready" ? t("up.ready") : st === "error" ? t("up.error") : "";
+  return (
+    <>
+      <Row icon={<Info />} label={t("up.current", { v: ver || "…" })}>{status && <span className="hint" role="status">{status}</span>}</Row>
+      <div className="btnrow end">
+        {st === "available" ? <button className="primary" onClick={install}>{t("up.install")}</button>
+          : st === "ready" ? <button className="primary" onClick={() => relaunch()}>{t("up.restart")}</button>
+          : <button className="ghostb" disabled={st === "checking" || st === "downloading"} onClick={find}>{t("up.check")}</button>}
+      </div>
+    </>
   );
 }
 
@@ -154,6 +195,10 @@ export function Settings(p: P) {
             </div>
           </Panel>
         </div>
+      </Band>
+
+      <Band title={t("s.updates")} icon={<Refresh />}>
+        <Panel><Updates /></Panel>
       </Band>
 
       <Band title={t("s.community")} icon={<Globe />}>

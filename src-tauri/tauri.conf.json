@@ -1,7 +1,7 @@
 {
   "productName": "Stratum",
   "version": "0.1.0",
-  "identifier": "dev.stratum.app",
+  "identifier": "com.arkynox.stratum",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -25,6 +25,14 @@
     ],
     "security": {
       "csp": null
+    }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/AkkilMG/Stratum/releases/latest/download/latest.json"
+      ],
+      "pubkey": "REPLACE_WITH_OUTPUT_OF_tauri_signer_generate"
     }
   },
   "bundle": {
@@ -71,10 +79,12 @@
         ]
       }
     },
-    "copyright": "© 2026 Arkynox. Stratum is free and open source under the Stratum Community License. Developed by Akkil M G.",
+    "copyright": "© 2026 Arkynox. Stratum is free and open source, dual-licensed under the Stratum Community License or Apache-2.0 (SPDX: Apache-2.0 OR LicenseRef-Stratum-Community-1.0). Developed by Akkil M G.",
     "resources": [
       "../THIRD_PARTY_NOTICES.txt",
       "../LICENSE.txt",
+      "../LICENSE-APACHE.txt",
+      "../LICENSING.md",
       "../NOTICE",
       "../TRADEMARK.md",
       "../legal/EULA.md",

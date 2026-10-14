@@ -7,7 +7,8 @@ Stratum keeps every version of every texture, map, model and source file, finds 
 Stratum is **free and open source — and it will stay that way.** The full source code is public and everyone is welcome to contribute, report bugs, request features and improve the documentation.
 
 [![CI](https://github.com/AkkilMG/Stratum/actions/workflows/ci.yml/badge.svg)](https://github.com/AkkilMG/Stratum/actions/workflows/ci.yml)
-[![License: Stratum Community](https://img.shields.io/badge/license-Stratum%20Community-2b50ff.svg)](LICENSE.txt)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/AkkilMG/Stratum/badge)](https://securityscorecards.dev/viewer/?uri=github.com/AkkilMG/Stratum)
+[![License: Apache-2.0 OR Stratum Community](https://img.shields.io/badge/license-Apache--2.0%20OR%20Stratum%20Community-2b50ff.svg)](LICENSING.md)
 ![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-98a3b3)
 [![Made with Tauri](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg)](https://tauri.app)
 
@@ -52,7 +53,7 @@ Prebuilt installers are published on the [releases page](https://github.com/Akki
 
 ## Build from source
 
-**Prerequisites:** Rust (stable), Node.js 18+ (20 recommended), Git, and the [Tauri v2 system dependencies](https://tauri.app/start/prerequisites/) for your OS.
+**Prerequisites:** Rust (stable), Node.js 20.19+ (see `.nvmrc`), Git, and the [Tauri v2 system dependencies](https://tauri.app/start/prerequisites/) for your OS.
 Optional local AI: `ollama pull llava:7b && ollama pull nomic-embed-text`.
 
 ```bash
@@ -79,6 +80,21 @@ Drag files or folders into the window to import them (copied to `Imported/`, the
 
 The index database and thumbnails always stay on the local machine. Network drives are detected automatically and use polling plus a local git directory.
 
+## Releases, signing and trust
+
+Installers are built in public CI and published on [GitHub Releases](https://github.com/AkkilMG/Stratum/releases). Every release ships a Software Bill of Materials and SLSA build-provenance attestations that anyone can verify:
+
+```bash
+gh attestation verify ./Stratum_0.1.0_x64-setup.exe --repo AkkilMG/Stratum
+```
+
+Stratum is **free and open source at $0 cost**, so it uses free trust paths: SignPath Foundation for Windows (once approved), ad-hoc signing for macOS, and store builders for Linux. Installed builds update themselves from the signed release feed.
+
+- [`docs/CERTIFICATION.md`](docs/CERTIFICATION.md) — how trust is established on each platform.
+- [`docs/DISTRIBUTION.md`](docs/DISTRIBUTION.md) — packaging, stores and package managers.
+- [`docs/SUPPLY-CHAIN.md`](docs/SUPPLY-CHAIN.md) — SBOM, SBOM/provenance attestations and verification.
+- [`packaging/`](packaging/) — manifests for winget, Scoop, Chocolatey, Homebrew, Flatpak, Snap, AUR and MSIX.
+
 ## Contributing
 
 All contributions are welcome — code, documentation, translations, bug reports and feature ideas. You do not need to be part of any team to help.
@@ -92,7 +108,9 @@ When you modify Stratum, please clearly mark your version as a modification of S
 
 ## License
 
-Stratum is released under the **Stratum Community License**. In short: free to use, study, modify and share; not for resale; and forks must be honest about being modifications of Stratum. See [`LICENSE.txt`](LICENSE.txt) for the exact terms and [`TRADEMARK.md`](TRADEMARK.md) for brand usage.
+Stratum is **dual-licensed** — you may use it under the **Stratum Community License** *or* the **Apache License 2.0**, at your choice. In short: free to use, study, modify and share. The Community License adds a no-resale clause and asks forks to stay honest about being modifications of Stratum; **Apache-2.0** is the permissive, OSI-approved alternative (with a patent grant) for anyone who needs it.
+
+See [`LICENSING.md`](LICENSING.md) for how to choose, [`LICENSE.txt`](LICENSE.txt) for the Community License, [`LICENSE-APACHE.txt`](LICENSE-APACHE.txt) for Apache-2.0, and [`TRADEMARK.md`](TRADEMARK.md) for brand usage.
 
 Stratum includes open-source components under their own licenses. See [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt) or the in-app **Licenses** screen.
 

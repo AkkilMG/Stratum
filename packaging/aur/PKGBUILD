@@ -1,0 +1,23 @@
+# Maintainer: Akkil M G <support@arkynox.com>
+# AUR package for Stratum, using the published .deb. Update pkgver, the source
+# URL and sha256sums for each release:
+#   updpkgsums && makepkg --printsrcinfo > .SRCINFO
+pkgname=stratum-bin
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Local-first, versioned, searchable asset vault for game studios"
+arch=('x86_64')
+url="https://arkynox.com"
+license=('Apache' 'custom:Stratum-Community-1.0')
+depends=('webkit2gtk-4.1' 'gtk3' 'libayatana-appindicator' 'librsvg' 'git' 'hicolor-icon-theme')
+provides=('stratum')
+conflicts=('stratum')
+options=('!strip' '!debug')
+source_x86_64=("stratum-${pkgver}.deb::https://github.com/AkkilMG/Stratum/releases/download/v${pkgver}/Stratum_${pkgver}_amd64.deb")
+sha256sums_x86_64=('__SHA256_DEB__')
+
+package() {
+  cd "${srcdir}"
+  bsdtar -xf "stratum-${pkgver}.deb"
+  bsdtar -xf data.tar.* -C "${pkgdir}"
+}

@@ -15,14 +15,18 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-22.04, macos-latest]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Linux system packages
         if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libgtk-3-dev
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
       - uses: dtolnay/rust-toolchain@stable
@@ -31,19 +35,24 @@ jobs:
           workspaces: "./src-tauri -> target"
       - run: npm install
       - run: npm run icons
+      # Auto-updater artifacts require TAURI_SIGNING_PRIVATE_KEY; see docs/BUILDING.md.
       # Windows signing is optional: scripts/sign-windows.ps1 is a no-op unless these secrets
       # are set, so the workflow still produces unsigned installers without a certificate.
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
           WINDOWS_TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Stratum ${{ github.ref_name }}"
           releaseDraft: true
-      - uses: actions/upload-artifact@v4
+          args: --config src-tauri/tauri.release.conf.json
+          updaterJsonPreferNsis: true
+      - uses: actions/upload-artifact@v7
         with:
           name: stratum-${{ matrix.os }}
           path: |
@@ -53,3 +62,41 @@ jobs:
             src-tauri/target/release/bundle/**/*.rpm
             src-tauri/target/release/bundle/**/*.AppImage
             src-tauri/target/release/bundle/**/*.dmg
+
+      # --- Supply chain: SBOM + SLSA provenance attestations ---
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          config: .github/syft.yaml
+          format: spdx-json
+          output-file: stratum-${{ matrix.os }}.spdx.json
+          artifact-name: stratum-${{ matrix.os }}-sbom
+          upload-artifact: true
+          upload-release-assets: false
+      - name: Attach SBOM to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" "stratum-${{ matrix.os }}.spdx.json" --clobber
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.rpm
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.dmg
+      - name: Attest SBOM
+        uses: actions/attest-sbom@v4
+        with:
+          subject-path: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.rpm
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.dmg
+          sbom-path: stratum-${{ matrix.os }}.spdx.json

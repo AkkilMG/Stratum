@@ -6,9 +6,13 @@ Stratum (the "Software") is a product of Arkynox (https://arkynox.com), develope
 
 Stratum is free and open source software. This agreement sets out the terms on which you may use, study, modify and share it. It is not an approval-required agreement. By using, copying, modifying or distributing the Software you accept these terms. If you do not agree, do not use the Software.
 
+**Dual licensing.** Stratum is offered under two licenses: this Stratum Community License *or* the Apache License 2.0, at your choice. If you prefer the permissive, OSI-approved terms of Apache-2.0 (for example, to redistribute or fork without the no-resale and no-rebrand conditions below), you may use the Software under Apache-2.0 instead of this agreement. The full Apache-2.0 text ships with the Software as LICENSE-APACHE.txt and is available at https://www.apache.org/licenses/LICENSE-2.0. Whichever license you choose, no fee is payable to us.
+
 ## 1. Free and open
 
 The full source code is public. Stratum is free of charge and is intended to remain free of charge forever. Everyone is welcome to read the code, build it, modify it, share it, report bugs, request features and contribute improvements.
+
+The conditions in section 3 apply when you use the Software under this Community License. They do not apply if you choose to use the Software under the Apache License 2.0 instead. The "Stratum" and "Arkynox" names and marks remain trademarks regardless of which license you choose.
 
 ## 2. License grant
 

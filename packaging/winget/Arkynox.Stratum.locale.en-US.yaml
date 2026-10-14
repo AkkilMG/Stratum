@@ -1,0 +1,28 @@
+PackageIdentifier: Arkynox.Stratum
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Arkynox
+PublisherUrl: https://arkynox.com
+PublisherSupportUrl: https://github.com/AkkilMG/Stratum/issues
+Author: Akkil M G
+PackageName: Stratum
+PackageUrl: https://arkynox.com
+License: Apache-2.0 OR Stratum Community License
+LicenseUrl: https://github.com/AkkilMG/Stratum/blob/main/LICENSING.md
+Copyright: © 2026 Arkynox
+ShortDescription: Local-first, versioned, searchable asset vault for game studios.
+Description: >
+  Stratum keeps every version of every texture, map, model and source file,
+  finds assets by what they look like, and works fully offline. It is a local
+  first, searchable asset vault for game studios and a product of Arkynox.
+Moniker: stratum
+Tags:
+  - game-development
+  - asset-management
+  - version-control
+  - search
+  - local-first
+  - tauri
+ReleaseNotesUrl: https://github.com/AkkilMG/Stratum/releases/tag/v0.1.0
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

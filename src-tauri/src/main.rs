@@ -36,6 +36,9 @@ fn err_code(msg: &str) -> &'static str {
 /// Full `E:code` form for a top-level error returned to the UI.
 fn sanitize_err(msg: &str) -> String { format!("E:{}", err_code(msg)) }
 const OLLAMA: &str = "http://localhost:11434";
+fn http(timeout: Duration) -> ureq::Agent {
+    ureq::Agent::config_builder().timeout_global(Some(timeout)).build().into()
+}
 static CACHE: OnceLock<PathBuf> = OnceLock::new();
 static AUTHOR: Mutex<String> = Mutex::new(String::new());
 static GEN: AtomicU64 = AtomicU64::new(0);
@@ -273,16 +276,16 @@ fn prune_thumbs(root: &Path) {
 
 // ---------- local AI (Ollama) ----------
 fn embed(text: &str) -> Option<Vec<f32>> {
-    let v: Value = ureq::post(&format!("{OLLAMA}/api/embed")).timeout(Duration::from_secs(60))
-        .send_json(json!({"model": "nomic-embed-text", "input": text})).ok()?.into_json().ok()?;
+    let v: Value = http(Duration::from_secs(60)).post(&format!("{OLLAMA}/api/embed"))
+        .send_json(json!({"model": "nomic-embed-text", "input": text})).ok()?.body_mut().read_json().ok()?;
     serde_json::from_value(v["embeddings"][0].clone()).ok()
 }
 fn vision_tags(abs: &Path) -> Option<String> {
     let b = B64.encode(fs::read(abs).ok()?);
-    let v: Value = ureq::post(&format!("{OLLAMA}/api/generate")).timeout(Duration::from_secs(300)).send_json(json!({
+    let v: Value = http(Duration::from_secs(300)).post(&format!("{OLLAMA}/api/generate")).send_json(json!({
         "model": "llava:7b", "stream": false, "images": [b],
         "prompt": "Return a comma-separated list of 5 descriptive tags for this game asset. No conversational text."
-    })).ok()?.into_json().ok()?;
+    })).ok()?.body_mut().read_json().ok()?;
     Some(v["response"].as_str()?.trim().to_lowercase())
 }
 fn tag_pending(app: &AppHandle, root: &Path) {
@@ -375,7 +378,7 @@ async fn stats(st: State<'_, Vault>) -> R<Stats> {
     let by_kind: Vec<(String, i64)> = c.prepare("SELECT kind,SUM(size) FROM assets GROUP BY kind ORDER BY 2 DESC").map_err(e)?
         .query_map([], |x| Ok((x.get(0)?, x.get(1)?))).map_err(e)?.flatten().collect();
     let commits = String::from_utf8_lossy(&git(&r, &["rev-list", "--count", "HEAD"])).trim().parse().unwrap_or(0);
-    let ollama = ureq::get(&format!("{OLLAMA}/api/tags")).timeout(Duration::from_millis(800)).call().is_ok();
+    let ollama = http(Duration::from_millis(800)).get(&format!("{OLLAMA}/api/tags")).call().is_ok();
     let lfs = !git(&r, &["lfs", "version"]).is_empty();
     let remote = String::from_utf8_lossy(&git(&r, &["remote", "get-url", "origin"])).trim().to_string();
     let br = String::from_utf8_lossy(&git(&r, &["rev-parse", "--abbrev-ref", "HEAD"])).trim().to_string();
@@ -603,13 +606,13 @@ struct Check { git: bool, lfs: bool, ollama: bool, vision: bool, embed: bool }
 #[tauri::command]
 async fn system_check() -> R<Check> {
     let t = |a: &[&str]| { let mut c = Command::new("git"); c.args(a); #[cfg(windows)] c.creation_flags(0x08000000); c.output().map(|o| o.status.success()).unwrap_or(false) };
-    let v: Option<Value> = ureq::get(&format!("{OLLAMA}/api/tags")).timeout(Duration::from_millis(1500)).call().ok().and_then(|r| r.into_json().ok());
+    let v: Option<Value> = http(Duration::from_millis(1500)).get(&format!("{OLLAMA}/api/tags")).call().ok().and_then(|mut r| r.body_mut().read_json::<Value>().ok());
     let names: String = v.as_ref().and_then(|v| v["models"].as_array()).map(|a| a.iter().filter_map(|m| m["name"].as_str()).collect::<Vec<_>>().join(" ")).unwrap_or_default();
     Ok(Check { git: t(&["--version"]), lfs: t(&["lfs", "version"]), ollama: v.is_some(), vision: names.contains("llava"), embed: names.contains("nomic-embed-text") })
 }
 #[tauri::command]
 async fn pull_model(name: String) -> R<()> {
-    ureq::post(&format!("{OLLAMA}/api/pull")).timeout(Duration::from_secs(7200)).send_json(json!({"model": name, "stream": false})).map_err(e)?;
+    http(Duration::from_secs(7200)).post(&format!("{OLLAMA}/api/pull")).send_json(json!({"model": name, "stream": false})).map_err(e)?;
     Ok(())
 }
 #[tauri::command]
@@ -665,6 +668,8 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             let _ = CACHE.set(app.path().app_local_data_dir().unwrap_or_else(|_| std::env::temp_dir()).join("vaults"));
             // The window is declared in tauri.conf.json but marked `create: false`, so it is built here

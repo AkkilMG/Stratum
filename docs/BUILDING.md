@@ -84,6 +84,37 @@ To encode a certificate on Windows:
 [Convert]::ToBase64String([IO.File]::ReadAllBytes("certificate.pfx")) | Set-Clipboard
 ```
 
+## macOS code signing (optional)
+
+Stratum for macOS currently ships **self-signed (ad-hoc)**, not notarized, because notarization requires a paid Apple Developer account. The configuration is wired but inactive and lives in [`src-tauri/tauri.macos.conf.json`](../src-tauri/tauri.macos.conf.json) together with [`src-tauri/Entitlements.plist`](../src-tauri/Entitlements.plist).
+
+To produce a self-signed build:
+
+```bash
+npm run tauri build -- --config src-tauri/tauri.macos.conf.json
+```
+
+Users of a self-signed build may need to right-click → **Open** the first time, or install the Homebrew cask with `--no-quarantine`. If you later obtain a Developer ID certificate, set `bundle.macOS.signingIdentity` to its name and add the notarization variables (`APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID`) as secrets; see [docs/CERTIFICATION.md](CERTIFICATION.md).
+
+## Auto-updates (signing key)
+
+Installed builds check the GitHub Releases `latest.json` feed and install signed updates in place. Update artifacts are created only when the release build enables `createUpdaterArtifacts` (via `--config src-tauri/tauri.release.conf.json`) **and** the private signing key is present.
+
+Generate a key pair once:
+
+```bash
+npm run tauri signer generate -- -w ~/.tauri/stratum.key
+```
+
+This prints a public key. Paste it into `plugins.updater.pubkey` in `src-tauri/tauri.conf.json`, and store the private key as the repository secret `TAURI_SIGNING_PRIVATE_KEY` (plus `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` if you set one). **Never commit the private key.**
+
+| Secret | Meaning |
+| --- | --- |
+| `TAURI_SIGNING_PRIVATE_KEY` | the private key, or its base64 contents |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | the key password, if any |
+
+The updater works for the NSIS installer (Windows), the `.app` bundle (macOS) and the AppImage (Linux). Debian, RPM and MSI packages are not updated in place; users update those through their package manager. See [docs/DISTRIBUTION.md](DISTRIBUTION.md).
+
 ## License bundle
 
 Before packaging, the build runs `npm run licenses`, which writes `src/licenses.json` (in-app viewer) and `THIRD_PARTY_NOTICES.txt` (shipped with installers). It needs both `cargo` and a completed `npm install`. Run it manually any time dependencies change:

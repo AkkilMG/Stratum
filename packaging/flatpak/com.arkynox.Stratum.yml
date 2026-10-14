@@ -1,0 +1,54 @@
+# Flatpak manifest for Stratum (builds from the published .deb).
+# Validate in a clean container before submitting to Flathub:
+#   flatpak-builder --force-clean --user --disable-cache --repo repo build-dir com.arkynox.Stratum.yml
+#   flatpak --user remote-add --no-gpg-verify local repo && flatpak --user install local com.arkynox.Stratum
+# Notes:
+#   - Stratum shells out to `git`; the GNOME runtime does not ship it, so a git
+#     module must be bundled (see the commented module) or the app will not be able
+#     to open or sync vaults inside the sandbox.
+#   - Replace __SHA256_DEB__ with the SHA-256 of the release .deb.
+id: com.arkynox.Stratum
+runtime: org.gnome.Platform
+runtime-version: "47"
+sdk: org.gnome.Sdk
+command: stratum
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --share=ipc
+  - --share=network
+  - --filesystem=home
+  - --filesystem=removable-media
+modules:
+  - name: stratum
+    buildsystem: simple
+    sources:
+      - type: file
+        url: https://github.com/AkkilMG/Stratum/releases/download/v0.1.0/Stratum_0.1.0_amd64.deb
+        sha256: __SHA256_DEB__
+        only-arches: [x86_64]
+      - type: file
+        path: com.arkynox.Stratum.metainfo.xml
+    build-commands:
+      - set -e
+      - mkdir deb-extract
+      - ar -x *.deb --output deb-extract
+      - tar -C deb-extract -xf deb-extract/data.tar.gz
+      - install -Dm755 deb-extract/usr/bin/stratum /app/bin/stratum
+      - sed -i 's/^Icon=.*/Icon=com.arkynox.Stratum/' deb-extract/usr/share/applications/Stratum.desktop
+      - install -Dm644 deb-extract/usr/share/applications/Stratum.desktop /app/share/applications/com.arkynox.Stratum.desktop
+      - install -Dm644 deb-extract/usr/share/icons/hicolor/128x128/apps/stratum.png /app/share/icons/hicolor/128x128/apps/com.arkynox.Stratum.png
+      - install -Dm644 deb-extract/usr/share/icons/hicolor/32x32/apps/stratum.png /app/share/icons/hicolor/32x32/apps/com.arkynox.Stratum.png
+      - install -Dm644 deb-extract/usr/share/icons/hicolor/256x256@2/apps/stratum.png /app/share/icons/hicolor/512x512/apps/com.arkynox.Stratum.png
+      - install -Dm644 com.arkynox.Stratum.metainfo.xml /app/share/metainfo/com.arkynox.Stratum.metainfo.xml
+  # Bundled git: required because Stratum invokes the git CLI at runtime.
+  - name: git
+    buildsystem: autotools
+    config-opts:
+      - --with-gitconfig=/etc/gitconfig
+      - --with-libpcre2
+    sources:
+      - type: archive
+        url: https://www.kernel.org/pub/software/scm/git/git-2.47.1.tar.xz
+        sha256: __SHA256_GIT_TARBALL__

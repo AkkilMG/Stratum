@@ -20,6 +20,7 @@ src-tauri/WixTools/
 *.rpm
 *.dmg
 dist-linux/
+dist-artifacts/
 
 # Test and coverage output
 coverage/

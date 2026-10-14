@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ScoopInstaller/Scoop/master/schema.json",
+  "version": "0.1.0",
+  "description": "Local-first, versioned, searchable asset vault for game studios.",
+  "homepage": "https://arkynox.com",
+  "license": "Apache-2.0 OR LicenseRef-Stratum-Community-1.0",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/AkkilMG/Stratum/releases/download/v0.1.0/Stratum_0.1.0_x64-setup.exe",
+      "hash": "__SHA256__"
+    }
+  },
+  "installer": {
+    "script": [
+      "$f = \"$dir\\Stratum_0.1.0_x64-setup.exe\"",
+      "Start-Process -Wait -FilePath $f -ArgumentList '/S'",
+      "Remove-Item $f"
+    ]
+  },
+  "checkver": {
+    "github": "https://github.com/AkkilMG/Stratum"
+  },
+  "autoupdate": {
+    "architecture": {
+      "64bit": {
+        "url": "https://github.com/AkkilMG/Stratum/releases/download/v$version/Stratum_$version_x64-setup.exe"
+      }
+    }
+  }
+}

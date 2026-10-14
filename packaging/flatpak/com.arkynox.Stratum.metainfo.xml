@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.arkynox.Stratum</id>
+  <launchable type="desktop-id">com.arkynox.Stratum.desktop</launchable>
+  <name>Stratum</name>
+  <developer id="com.arkynox">
+    <name>Arkynox</name>
+  </developer>
+  <content_rating type="oars-1.1" />
+  <keywords>
+    <keyword>asset management</keyword>
+    <keyword>game development</keyword>
+    <keyword>version control</keyword>
+    <keyword>search</keyword>
+  </keywords>
+  <branding>
+    <color type="primary" scheme_preference="light">#2b50ff</color>
+    <color type="primary" scheme_preference="dark">#0b1018</color>
+  </branding>
+  <recommends>
+    <display_length compare="ge">1000</display_length>
+  </recommends>
+  <summary>Local-first, versioned, searchable asset vault for game studios</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0 OR LicenseRef-Stratum-Community-1.0</project_license>
+  <url type="homepage">https://arkynox.com</url>
+  <url type="bugtracker">https://github.com/AkkilMG/Stratum/issues</url>
+  <url type="vcs">https://github.com/AkkilMG/Stratum</url>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+  <description>
+    <p>
+      Stratum keeps every version of every texture, map, model and source file,
+      finds assets by what they look like, and works fully offline. Nothing is
+      uploaded to anyone's cloud.
+    </p>
+  </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/AkkilMG/Stratum/main/docs/screenshots/main.png</image>
+      <caption>The Stratum asset vault</caption>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="0.1.0" date="2026-01-01">
+      <description>
+        <p>First public release.</p>
+      </description>
+    </release>
+  </releases>
+  <update_contact>support@arkynox.com</update_contact>
+</component>

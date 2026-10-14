@@ -1,6 +1,6 @@
 ## Stratum is free and open source
 
-Stratum is free of charge and is intended to remain free of charge forever. The full source code is public and everyone is welcome to use it, study it, build it, modify it and share it under the Stratum Community License.
+Stratum is free of charge and is intended to remain free of charge forever. The full source code is public and everyone is welcome to use it, study it, build it, modify it and share it under the **Stratum Community License** or, at your choice, the **Apache License 2.0** (a permissive, OSI-approved license). See LICENSING.md for how to choose.
 
 Repository: https://github.com/AkkilMG/Stratum
 
@@ -17,7 +17,7 @@ When you modify Stratum, that is allowed and encouraged. The license asks only t
 
 ## License in one line
 
-Free to use, study, modify and share. Not for resale, and forks must be honest about being modifications of Stratum.
+Free to use, study, modify and share — under the Community License (no resale; forks must be honest about being modifications of Stratum) or the permissive Apache-2.0, your choice.
 
 ## Links
 

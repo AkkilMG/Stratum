@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Stratum
+Comment=Local-first, versioned, searchable asset vault for game studios
+Exec=stratum
+Icon=com.arkynox.Stratum
+Terminal=false
+Categories=Development;Graphics;
+Keywords=asset;game;vault;version;
+StartupWMClass=Stratum

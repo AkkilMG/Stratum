@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type * as React from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { call } from "../../services/api";
 import { Credits, LangPicker } from "../common";
@@ -50,11 +51,11 @@ export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { st
   }
   const dl = async (m: string) => { setPull(m); try { await call("pull_model", { name: m }); } catch (e) { setErr(errText(e)); } setPull(""); recheck(); };
 
-  const row = (label: Key, ok: boolean | undefined, req: boolean, help: Key, act?: JSX.Element) => (
+  const row = (label: Key, ok: boolean | undefined, req: boolean, help: Key, act?: React.JSX.Element) => (
     <div className="crow" key={label}><i className={"dot " + (ok ? "ok" : req ? "bad" : "warn")} /><div><b>{t(label)}</b> <em>{req ? t("c.required") : t("c.optional")}</em><small>{ok ? t("c.ready") : t(help)}</small></div>{!ok && act}</div>
   );
   const dlBtn = (m: string) => <button className="ghostb" disabled={!chk?.ollama || !!pull} onClick={() => dl(m)}>{pull === m ? t("c.downloading") : t("c.download")}</button>;
-  const modes: [Cfg["mode"], JSX.Element, Key, Key, Key | ""][] = [["local", I.pc, "w.m_local", "w.m_local_d", ""], ["hub", I.nas, "w.m_hub", "w.m_hub_d", "w.m_hub_tag"], ["join", I.team, "w.m_join", "w.m_join_d", ""]];
+  const modes: [Cfg["mode"], React.JSX.Element, Key, Key, Key | ""][] = [["local", I.pc, "w.m_local", "w.m_local_d", ""], ["hub", I.nas, "w.m_hub", "w.m_hub_d", "w.m_hub_tag"], ["join", I.team, "w.m_join", "w.m_join_d", ""]];
 
   return (
     <div className="wiz">

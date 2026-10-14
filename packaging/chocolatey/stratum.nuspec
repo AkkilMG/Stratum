@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>stratum</id>
+    <version>0.1.0</version>
+    <title>Stratum</title>
+    <authors>Akkil M G</authors>
+    <owners>Arkynox</owners>
+    <projectUrl>https://arkynox.com</projectUrl>
+    <packageSourceUrl>https://github.com/AkkilMG/Stratum/tree/main/packaging/chocolatey</packageSourceUrl>
+    <projectSourceUrl>https://github.com/AkkilMG/Stratum</projectSourceUrl>
+    <docsUrl>https://github.com/AkkilMG/Stratum/blob/main/README.md</docsUrl>
+    <bugTrackerUrl>https://github.com/AkkilMG/Stratum/issues</bugTrackerUrl>
+    <tags>stratum game-development asset-management version-control local-first</tags>
+    <summary>Local-first, versioned, searchable asset vault for game studios.</summary>
+    <description>Stratum keeps every version of every texture, map, model and source file, finds assets by what they look like, and works fully offline.</description>
+    <licenseUrl>https://github.com/AkkilMG/Stratum/blob/main/LICENSING.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>https://github.com/AkkilMG/Stratum/releases/tag/v0.1.0</releaseNotes>
+    <copyright>© 2026 Arkynox</copyright>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

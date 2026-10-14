@@ -1,0 +1,62 @@
+# Snapcraft recipe for Stratum. Register the name "stratum" on the Snap Store first.
+# Build with: snapcraft   ·   Test with: snap run stratum
+# Notes:
+#   - The desktop file name must match what Tauri emits (Stratum.desktop); verify after build.
+#   - git is staged because Stratum invokes the git CLI at runtime.
+name: stratum
+base: core22
+version: "0.1.0"
+summary: Local-first, versioned, searchable asset vault for game studios
+description: |
+  Stratum keeps every version of every texture, map, model and source file,
+  finds assets by what they look like, and works fully offline. It is a local
+  first, searchable asset vault for game studios and a product of Arkynox.
+grade: stable
+confinement: strict
+license: "Apache-2.0 OR LicenseRef-Stratum-Community-1.0"
+
+layout:
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+
+apps:
+  stratum:
+    command: usr/bin/stratum
+    desktop: usr/share/applications/Stratum.desktop
+    extensions: [gnome]
+    plugs:
+      - home
+      - removable-media
+      - network
+      - network-bind
+      - unity7
+
+parts:
+  build-app:
+    plugin: dump
+    build-snaps:
+      - node/20/stable
+      - rustup/latest/stable
+    build-packages:
+      - libwebkit2gtk-4.1-dev
+      - build-essential
+      - curl
+      - wget
+      - file
+      - libxdo-dev
+      - libssl-dev
+      - libayatana-appindicator3-dev
+      - librsvg2-dev
+      - dpkg
+    stage-packages:
+      - libwebkit2gtk-4.1-0
+      - libayatana-appindicator3-1
+      - git
+    source: .
+    override-build: |
+      set -eu
+      npm install
+      npm run tauri build -- --bundles deb
+      dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
+      sed -i -e "s|Icon=stratum|Icon=/usr/share/icons/hicolor/32x32/apps/stratum.png|g" \
+        $SNAPCRAFT_PART_INSTALL/usr/share/applications/Stratum.desktop
