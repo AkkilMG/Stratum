@@ -117,19 +117,31 @@ jobs:
       - name: Flatten installers into release/
         shell: bash
         run: |
-          mkdir -p release
+          mkdir -p release _fresh
           find _artifacts -type f \
             \( -name '*.msi' -o -name '*.exe' -o -name '*.deb' -o -name '*.rpm' \
                -o -name '*.AppImage' -o -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.sig' \) \
-            -exec cp -t release/ {} +
-          rm -rf _artifacts
+            -exec cp -t _fresh {} +
+          if [ -z "$(ls -A _fresh)" ]; then
+            echo "No installers produced - release/ left untouched."
+            rm -rf _artifacts _fresh
+            exit 0
+          fi
+          # Strict replace: release/ mirrors this run exactly, so drop superseded installers
+          # (old versions, platforms absent from this run). maxdepth 1 spares release/DO NOT TOUCH.
+          find release -maxdepth 1 -type f \
+            \( -name '*.msi' -o -name '*.exe' -o -name '*.deb' -o -name '*.rpm' \
+               -o -name '*.AppImage' -o -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.sig' \) \
+            -delete
+          cp -t release/ _fresh/*
+          rm -rf _artifacts _fresh
           ls -la release/
       - name: Commit and push
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f release
+          git add -Af release
           if git diff --cached --quiet; then
             echo "No installer changes to commit."
             exit 0
