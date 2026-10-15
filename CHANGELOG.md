@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.1.0] - 2026-10-15
 
-The first public release of Stratum. This release is free and open source under the [Stratum Community License](LICENSE.txt).
+The first public release of Stratum. This release is free and open source, dual-licensed under the [Stratum Community License](LICENSE.txt) or the [Apache License 2.0](LICENSE-APACHE.txt).
 
 ### Added
 
@@ -53,21 +53,36 @@ The first public release of Stratum. This release is free and open source under 
 
 **Distribution and project**
 
-- Installers for Windows (NSIS `.exe` and `.msi`), Linux (`.deb`, `.rpm`, `.AppImage`) and macOS (`.dmg`), with Docker-based Linux builds.
-- Free and open source under the Stratum Community License (source-available: free to use, study, modify and share; no resale or rebranding; modifications must be marked as a modification of Stratum).
+- Installers for Windows (NSIS `.exe` and `.msi`), Linux (`.deb`, `.rpm`, `.AppImage`) and macOS (`.dmg`), with Docker-based Linux builds. Requires Node.js 20.19+ to build from source.
+- Free and open source, dual-licensed under the [Stratum Community License](LICENSE.txt) or the OSI-approved [Apache License 2.0](LICENSE-APACHE.txt). Use it under either, at your choice; the Community License adds a no-resale clause and asks forks to stay honest about being modifications of Stratum. See [LICENSING.md](LICENSING.md).
+- Signed, in-app auto-updates: installed builds check the signed release feed and install new versions without reinstalling.
+- Supply-chain security: OpenSSF Scorecard, CodeQL static analysis, weekly `cargo audit` and `npm audit`, a per-platform SPDX Software Bill of Materials (generated with Syft), and SLSA build-provenance and SBOM attestations that anyone can verify with `gh attestation verify`. See [SUPPLY-CHAIN.md](docs/SUPPLY-CHAIN.md).
+- Free code-signing paths: Windows through [`scripts/sign-windows.ps1`](scripts/sign-windows.ps1) (PFX certificate) or the optional SignPath Foundation workflow, and macOS ad-hoc self-signed with hardened-runtime entitlements (config wired, inactive until a Developer ID is available). See [CERTIFICATION.md](docs/CERTIFICATION.md).
+- Package-manager manifests for winget, Scoop, Chocolatey, Homebrew, Flatpak, Snap, AUR and MSIX in [`packaging/`](packaging/), with a generator script to refresh versions and hashes. See [DISTRIBUTION.md](docs/DISTRIBUTION.md).
 - In-app Community section with links to the source code, contributing guide and issue tracker.
 - Continuous integration, issue and pull request templates, and Dependabot updates.
-- Project documentation: README, contributing guide, code of conduct, security policy, support, roadmap, architecture, building and development guides.
+- Project documentation: README, contributing guide, code of conduct, security policy, support, roadmap, architecture, building, development, translating, FAQ, certification, distribution and supply-chain guides.
 
 ### Changed
 
-- Stratum is now free and open source under the Stratum Community License.
+- Stratum is now free and open source, dual-licensed under the Stratum Community License or Apache-2.0 (SPDX: `Apache-2.0 OR LicenseRef-Stratum-Community-1.0`). The Apache-2.0 option is the OSI-approved alternative for registries and policies that require it.
+- Bundle identifier is now `com.arkynox.stratum`.
+- Toolchain and dependencies advanced to current major versions: React 19, Vite 8, ESLint 10, TypeScript 6, Tauri 2.12, ureq 3, resvg 0.48, rusqlite 0.40, notify 8, base64 0.23 and windows-sys 0.61.
+- CI/CD GitHub Actions updated to current major versions (checkout, setup-node and upload-artifact v7; CodeQL v4; Tauri Action v1; SignPath v3; attest actions v4; Scorecard v2.5).
 - About and Settings now link to the source repository and contribution channels.
+
+### Fixed
+
+- Windows code signing now resolves the signing script path correctly during `tauri build`.
+- React 19 compatibility: replaced the removed global `JSX` namespace with `React.JSX`.
 
 ### Security and privacy
 
 - No accounts, no telemetry and no cloud. Your files, tags and usage data stay on your own machines.
 - The index database and thumbnails always stay on the local machine.
+- Backend errors are reduced to stable, translatable codes, so file paths, host names and credentials never reach the interface.
+- Bounded time budgets for SVG and PSD thumbnail rendering and for local-AI requests, plus automatic pruning of the thumbnail cache, so a malformed or oversized asset cannot exhaust local resources.
+- The WebView is hardened against the browser context menu, reload/print/devtools accelerators and image drag-out.
 
 [Unreleased]: https://github.com/AkkilMG/Stratum/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/AkkilMG/Stratum/releases/tag/v0.1.0
