@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 import { withBasePath } from "@/lib/util";
+import { siteConfig } from "@/lib/config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,7 +18,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://akkilmg.github.io/Stratum"),
+  metadataBase: new URL(siteConfig.url),
   title: "Stratum Docs",
   description: "Official documentation for Stratum — local-first versioned searchable asset vault.",
   icons: {
