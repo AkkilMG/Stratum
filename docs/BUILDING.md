@@ -59,7 +59,7 @@ Output: `src-tauri/target/release/bundle/dmg/` and `.../macos/`.
 
 ## All platforms at once (CI)
 
-**Installers only (no release):** run the **build-installers** workflow from the Actions tab. It builds Windows, Linux and macOS on GitHub runners and uploads them as downloadable artifacts — handy from a machine without Linux/macOS. Download the `stratum-installers-all` artifact (or run `scripts/fetch-artifacts.ps1`) into `release/`.
+**Installers only (no release):** run the **build-installers** workflow from the Actions tab. It builds Windows, Linux and macOS on GitHub runners, uploads them as downloadable artifacts, and commits them into the `release/` folder — so a plain `git pull` brings the installers to a machine without Linux/macOS. Uncheck the *commit* input to build artifacts only (or download the `stratum-installers-all` artifact with `scripts/fetch-artifacts.ps1`).
 
 **Publish a release:** push a tag (`git tag v0.1.0 && git push --tags`), or run the **release** workflow manually and supply an existing tag. Installers appear as a draft release, with SBOM and build-provenance attestations. Both workflows use only the built-in token; no extra secrets are required.
 

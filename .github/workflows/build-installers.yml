@@ -1,11 +1,18 @@
-# Manually build production installers for every platform and upload them as
-# downloadable Actions artifacts. Use build-installers.yml when you just want the
-# installers (e.g. from a machine without Linux/macOS); use release.yml to also
-# publish them on a GitHub release. Uses only the built-in token.
+# Builds production installers for every platform, uploads them as downloadable
+# Actions artifacts, and (by default) commits them into the release/ folder so a
+# simple `git pull` brings them to any machine - handy without Linux/macOS locally.
+#
+# Run it from the Actions tab: Actions -> build-installers -> Run workflow.
+# Uses only the built-in token.
 name: build-installers
 
 on:
   workflow_dispatch:
+    inputs:
+      commit:
+        description: Commit the built installers into the release/ folder
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -29,6 +36,7 @@ jobs:
           - os: macos-latest
             platform: macOS
     env:
+      APPIMAGE_EXTRACT_AND_RUN: 1
       # Optional Windows Authenticode signing; scripts/sign-windows.ps1 no-ops when unset.
       WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
       WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
@@ -59,6 +67,10 @@ jobs:
       - name: Build (installers only, no signing key configured)
         if: ${{ env.TAURI_SIGNING_PRIVATE_KEY == '' }}
         run: npx tauri build
+      - name: List built bundle files
+        if: always()
+        shell: bash
+        run: find src-tauri/target/release/bundle -maxdepth 3 -type f 2>/dev/null || true
       - uses: actions/upload-artifact@v7
         with:
           name: stratum-${{ matrix.platform }}
@@ -88,3 +100,39 @@ jobs:
           name: stratum-installers-all
           if-no-files-found: error
           path: all/**
+
+  commit:
+    name: Commit installers to release/
+    needs: [build, collect]
+    if: ${{ !cancelled() && inputs.commit }}
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with:
+          name: stratum-installers-all
+          path: _artifacts
+      - name: Flatten installers into release/
+        shell: bash
+        run: |
+          mkdir -p release
+          find _artifacts -type f \
+            \( -name '*.msi' -o -name '*.exe' -o -name '*.deb' -o -name '*.rpm' \
+               -o -name '*.AppImage' -o -name '*.dmg' -o -name '*.app.tar.gz' -o -name '*.sig' \) \
+            -exec cp -t release/ {} +
+          rm -rf _artifacts
+          ls -la release/
+      - name: Commit and push
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A release
+          if git diff --cached --quiet; then
+            echo "No installer changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(release): add built installers [skip ci]"
+          git push
