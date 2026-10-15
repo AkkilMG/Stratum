@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/publish.ps1"
   },
   "dependencies": {
     "fuse.js": "^7.5.0",
