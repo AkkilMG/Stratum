@@ -68,36 +68,23 @@ if (-not $signtool) {
 $timestamp = if ($env:WINDOWS_TIMESTAMP_URL) { $env:WINDOWS_TIMESTAMP_URL } else { 'http://timestamp.digicert.com' }
 
 $pfx = Join-Path ([System.IO.Path]::GetTempPath()) ("stratum-sign-" + [guid]::NewGuid().ToString('N') + ".pfx")
-$thumbprint = $null
 try {
   [System.IO.File]::WriteAllBytes($pfx, [System.Convert]::FromBase64String($certB64))
 
-  if (Get-Command Import-PfxCertificate -ErrorAction SilentlyContinue) {
-    $importArgs = @{ FilePath = $pfx; CertStoreLocation = 'Cert:\CurrentUser\My' }
-    if (-not [string]::IsNullOrEmpty($env:WINDOWS_CERTIFICATE_PASSWORD)) {
-      $importArgs.Password = ConvertTo-SecureString $env:WINDOWS_CERTIFICATE_PASSWORD -AsPlainText -Force
-    }
-    $thumbprint = (Import-PfxCertificate @importArgs).Thumbprint
-
-    & $signtool sign /fd SHA256 /td SHA256 /tr $timestamp /sha1 $thumbprint $FilePath
-    if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE for $FilePath" }
+  # Sign straight from the .pfx via signtool. Import-PfxCertificate/ConvertTo-SecureString are
+  # deliberately avoided: Tauri runs this command with a sanitized environment where PSModulePath
+  # is not inherited, so the PKI/Security modules cannot autoload on CI runners.
+  $signArgs = @('sign', '/fd', 'SHA256', '/td', 'SHA256', '/tr', $timestamp, '/f', $pfx)
+  if (-not [string]::IsNullOrEmpty($env:WINDOWS_CERTIFICATE_PASSWORD)) {
+    $signArgs += @('/p', $env:WINDOWS_CERTIFICATE_PASSWORD)
   }
-  else {
-    $signArgs = @('sign', '/fd', 'SHA256', '/td', 'SHA256', '/tr', $timestamp, '/f', $pfx)
-    if (-not [string]::IsNullOrEmpty($env:WINDOWS_CERTIFICATE_PASSWORD)) {
-      $signArgs += @('/p', $env:WINDOWS_CERTIFICATE_PASSWORD)
-    }
-    $signArgs += $FilePath
+  $signArgs += $FilePath
 
-    & $signtool @signArgs
-    if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE for $FilePath" }
-  }
+  & $signtool @signArgs
+  if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE for $FilePath" }
 
   Write-Host "Signed $(Split-Path -Leaf $FilePath)"
 }
 finally {
-  if ($thumbprint) {
-    Remove-Item -LiteralPath ("Cert:\CurrentUser\My\" + $thumbprint) -Force -ErrorAction SilentlyContinue
-  }
   if (Test-Path -LiteralPath $pfx) { Remove-Item -LiteralPath $pfx -Force -ErrorAction SilentlyContinue }
 }
