@@ -40,7 +40,7 @@ jobs:
       # are set, so the workflow still produces unsigned installers without a certificate.
       - uses: tauri-apps/tauri-action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TOKEN: ${{ secrets.TOKEN }}
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
           WINDOWS_TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL }}
@@ -77,7 +77,7 @@ jobs:
       - name: Attach SBOM to release
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.TOKEN }}
         run: gh release upload "${{ github.ref_name }}" "stratum-${{ matrix.os }}.spdx.json" --clobber
       - name: Attest build provenance
         uses: actions/attest-build-provenance@v4

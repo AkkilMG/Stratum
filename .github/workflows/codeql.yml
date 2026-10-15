@@ -1,5 +1,5 @@
 # Static analysis with GitHub CodeQL.
-# Uses only the built-in GITHUB_TOKEN; no custom secrets are required.
+# Uses only the built-in TOKEN; no custom secrets are required.
 name: CodeQL
 
 on:

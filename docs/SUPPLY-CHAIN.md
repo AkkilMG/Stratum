@@ -88,6 +88,6 @@ and to GitHub code scanning. Keeping it high means:
 - [`SECURITY.md`](../SECURITY.md) documents how to report vulnerabilities
   privately.
 - [`CODEOWNERS`](../.github/CODEOWNERS) sets review ownership.
-- The default `GITHUB_TOKEN` is read-only; each workflow grants only what it
+- The default `TOKEN` is read-only; each workflow grants only what it
   needs.
 - No secrets are committed; signing keys live only in repository secrets.

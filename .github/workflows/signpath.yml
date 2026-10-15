@@ -71,7 +71,7 @@ jobs:
       - name: Attach signed installers to the release
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.TOKEN }}
         run: |
           find signed -type f \( -name '*.msi' -o -name '*.exe' \) -print0 \
             | xargs -0 gh release upload "${{ github.ref_name }}" --clobber

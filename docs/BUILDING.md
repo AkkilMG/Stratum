@@ -59,7 +59,7 @@ Output: `src-tauri/target/release/bundle/dmg/` and `.../macos/`.
 
 ## All platforms at once (CI)
 
-Push a tag (`git tag v0.1.0 && git push --tags`) or run the **build-installers** workflow manually from the Actions tab. Installers appear as a draft release and as downloadable artifacts. The workflow uses only the built-in `GITHUB_TOKEN`; no extra secrets are required.
+Push a tag (`git tag v0.1.0 && git push --tags`) or run the **build-installers** workflow manually from the Actions tab. Installers appear as a draft release and as downloadable artifacts. The workflow uses only the built-in `TOKEN`; no extra secrets are required.
 
 ## Windows code signing
 
