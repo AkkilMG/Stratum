@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="1600" height="900" fill="#0f1014"/>
+  <rect x="0" y="0" width="1600" height="900" fill="#0f1014" opacity="0.5"/>
+
+  <!-- Modal -->
+  <rect x="360" y="150" width="880" height="600" rx="18" fill="#15161d" stroke="#262936"/>
+  <text x="408" y="212" fill="#e7e9f2" font-size="22" font-weight="700">Share this space with your studio</text>
+  <text x="408" y="240" fill="#9aa0b4" font-size="13">Point Stratum at a bare Git repo on your NAS or a Git server.</text>
+
+  <!-- Two mode choices -->
+  <rect x="408" y="272" width="392" height="86" rx="12" fill="#1e1b3a" stroke="#8b7dff" stroke-width="1.5"/>
+  <circle cx="440" cy="304" r="10" fill="#8b7dff"/><path d="M435 304l4 4 7-8" stroke="#0f1014" stroke-width="2" fill="none"/>
+  <text x="466" y="308" fill="#e7e9f2" font-size="15" font-weight="600">Create shared space</text>
+  <text x="466" y="330" fill="#9aa0b4" font-size="12">Publish your vault to a NAS / server.</text>
+
+  <rect x="816" y="272" width="392" height="86" rx="12" fill="#171922" stroke="#262936"/>
+  <circle cx="848" cy="304" r="10" fill="none" stroke="#4b5163" stroke-width="2"/>
+  <text x="874" y="308" fill="#e7e9f2" font-size="15" font-weight="600">Join existing space</text>
+  <text x="874" y="330" fill="#9aa0b4" font-size="12">Clone a space a teammate already made.</text>
+
+  <!-- Remote path -->
+  <text x="408" y="410" fill="#9aa0b4" font-size="12" font-weight="600" letter-spacing="1">REMOTE LOCATION</text>
+  <rect x="408" y="424" width="800" height="46" rx="10" fill="#171922" stroke="#262936"/>
+  <text x="430" y="452" fill="#e7e9f2" font-size="14" font-family="ui-monospace, monospace">\\NAS\studio\stratum\art.git</text>
+  <rect x="1070" y="432" width="120" height="30" rx="8" fill="#171922" stroke="#262936"/>
+  <text x="1130" y="452" fill="#c8ccdb" font-size="12" text-anchor="middle">Browse…</text>
+
+  <!-- Test result -->
+  <rect x="408" y="494" width="800" height="58" rx="10" fill="#0e3f3a"/>
+  <circle cx="440" cy="523" r="11" fill="none" stroke="#34d399" stroke-width="2"/>
+  <path d="M434 523l4 5 8-9" stroke="#34d399" stroke-width="2" fill="none"/>
+  <text x="466" y="519" fill="#34d399" font-size="14" font-weight="600">Connection OK</text>
+  <text x="466" y="539" fill="#9aa0b4" font-size="12">Bare repository found · 4 teammates already syncing here</text>
+
+  <!-- Options -->
+  <rect x="408" y="576" width="24" height="24" rx="6" fill="#1e1b3a" stroke="#8b7dff"/>
+  <path d="M413 588l4 4 7-8" stroke="#8b7dff" stroke-width="2" fill="none"/>
+  <text x="444" y="594" fill="#e7e9f2" font-size="14">Enable Git LFS for large files</text>
+  <text x="444" y="614" fill="#9aa0b4" font-size="12">Recommended when the space holds big textures or PSDs.</text>
+
+  <!-- Footer buttons -->
+  <line x1="408" y1="660" x2="1208" y2="660" stroke="#262936"/>
+  <rect x="408" y="684" width="140" height="44" rx="10" fill="#171922" stroke="#262936"/>
+  <text x="478" y="712" fill="#c8ccdb" font-size="14" text-anchor="middle">Cancel</text>
+  <rect x="1028" y="684" width="180" height="44" rx="10" fill="#8b7dff"/>
+  <text x="1118" y="712" fill="#0f1014" font-size="14" font-weight="600" text-anchor="middle">Create shared space</text>
+</svg>

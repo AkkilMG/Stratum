@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://wiki.stratum.arkynox.com
+Sitemap: https://wiki.stratum.arkynox.com/sitemap.xml

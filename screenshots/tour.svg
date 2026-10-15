@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <mask id="spot">
+      <rect width="1600" height="900" fill="#000"/>
+      <rect x="612" y="196" width="286" height="206" rx="14" fill="#fff"/>
+    </mask>
+  </defs>
+  <rect width="1600" height="900" fill="#0f1014"/>
+
+  <!-- Library (underneath) -->
+  <rect x="0" y="0" width="260" height="900" fill="#121319"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#262936"/>
+  <circle cx="40" cy="44" r="14" fill="#8b7dff"/>
+  <text x="64" y="50" fill="#e7e9f2" font-size="17" font-weight="600">Stratum</text>
+  <rect x="260" y="0" width="1340" height="64" fill="#0f1014"/>
+  <line x1="260" y1="64" x2="1600" y2="64" stroke="#262936"/>
+  <text x="300" y="118" fill="#e7e9f2" font-size="26" font-weight="700">Library</text>
+  <g>
+    <rect x="300" y="196" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="312" y="208" width="266" height="150" rx="8" fill="#3b2f6b"/>
+    <rect x="612" y="196" width="290" height="210" rx="12" fill="#15161d" stroke="#8b7dff" stroke-width="2"/>
+    <rect x="624" y="208" width="266" height="150" rx="8" fill="#0e3f3a"/>
+    <text x="624" y="382" fill="#e7e9f2" font-size="14" font-weight="600">sector_map.png</text>
+    <rect x="920" y="196" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="932" y="208" width="266" height="150" rx="8" fill="#4a2f16"/>
+    <rect x="1230" y="196" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="1242" y="208" width="266" height="150" rx="8" fill="#3a1f3d"/>
+  </g>
+
+  <!-- Dim overlay with spotlight hole -->
+  <rect width="1600" height="900" fill="#0f1014" opacity="0.72" mask="url(#spot)"/>
+  <rect x="612" y="196" width="290" height="210" rx="14" fill="none" stroke="#8b7dff" stroke-width="2"/>
+
+  <!-- Coach mark card -->
+  <rect x="930" y="230" width="520" height="300" rx="16" fill="#15161d" stroke="#8b7dff" stroke-width="1.5"/>
+  <rect x="962" y="262" width="120" height="28" rx="14" fill="#1e1b3a"/>
+  <text x="1022" y="281" fill="#8b7dff" font-size="12" text-anchor="middle">Step 3 of 13</text>
+  <circle cx="1000" cy="322" r="16" fill="#1e1b3a"/>
+  <text x="1000" y="328" fill="#8b7dff" font-size="16" text-anchor="middle">3</text>
+  <text x="1034" y="330" fill="#e7e9f2" font-size="19" font-weight="700">Open an asset</text>
+  <text x="962" y="372" fill="#c8ccdb" font-size="14">Click any card to open the detail drawer</text>
+  <text x="962" y="394" fill="#c8ccdb" font-size="14">and see its preview, tags and version</text>
+  <text x="962" y="416" fill="#c8ccdb" font-size="14">history.</text>
+  <text x="962" y="456" fill="#6b7285" font-size="12">Running on a safe demo space — nothing here is real.</text>
+  <line x1="962" y1="474" x2="1418" y2="474" stroke="#262936"/>
+  <rect x="962" y="488" width="120" height="38" rx="9" fill="#171922" stroke="#262936"/>
+  <text x="1022" y="512" fill="#c8ccdb" font-size="13" text-anchor="middle">← Back</text>
+  <rect x="1280" y="488" width="140" height="38" rx="9" fill="#8b7dff"/>
+  <text x="1350" y="512" fill="#0f1014" font-size="13" font-weight="600" text-anchor="middle">Skip tour</text>
+  <rect x="1094" y="488" width="120" height="38" rx="9" fill="#171922" stroke="#262936"/>
+  <text x="1154" y="512" fill="#c8ccdb" font-size="13" text-anchor="middle">Next →</text>
+
+  <!-- Progress dots -->
+  <g>
+    <circle cx="1252" cy="560" r="4" fill="#8b7dff"/>
+    <circle cx="1272" cy="560" r="4" fill="#262936"/>
+    <circle cx="1292" cy="560" r="4" fill="#262936"/>
+    <circle cx="1312" cy="560" r="4" fill="#262936"/>
+    <circle cx="1332" cy="560" r="4" fill="#262936"/>
+    <circle cx="1352" cy="560" r="4" fill="#262936"/>
+    <circle cx="1372" cy="560" r="4" fill="#262936"/>
+    <circle cx="1392" cy="560" r="4" fill="#262936"/>
+  </g>
+</svg>
