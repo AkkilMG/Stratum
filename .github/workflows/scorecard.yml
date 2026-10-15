@@ -38,6 +38,8 @@ jobs:
           publish_results: true
 
       - name: Upload SARIF results
+        # Code scanning requires GitHub Advanced Security on private repos; only run on public.
+        if: github.event.repository.visibility == 'public'
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: results.sarif
