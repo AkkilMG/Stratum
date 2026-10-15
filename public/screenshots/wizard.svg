@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="1600" height="900" fill="#0f1014"/>
+  <circle cx="800" cy="120" r="360" fill="#8b7dff" opacity="0.06"/>
+
+  <!-- Window title -->
+  <circle cx="40" cy="40" r="12" fill="#8b7dff"/>
+  <text x="62" y="46" fill="#e7e9f2" font-size="16" font-weight="600">Stratum · Set up your space</text>
+
+  <!-- Stepper -->
+  <g font-size="12" font-weight="600" text-anchor="middle">
+    <circle cx="380" cy="150" r="16" fill="#34d399"/>
+    <text x="380" y="155" fill="#0f1014" font-size="14">✓</text>
+    <line x1="396" y1="150" x2="536" y2="150" stroke="#34d399" stroke-width="2"/>
+    <circle cx="552" cy="150" r="16" fill="#34d399"/>
+    <text x="552" y="155" fill="#0f1014" font-size="14">✓</text>
+    <line x1="568" y1="150" x2="708" y2="150" stroke="#8b7dff" stroke-width="2"/>
+    <circle cx="724" cy="150" r="16" fill="#8b7dff"/>
+    <text x="724" y="155" fill="#0f1014">3</text>
+    <line x1="740" y1="150" x2="880" y2="150" stroke="#262936" stroke-width="2"/>
+    <circle cx="896" cy="150" r="16" fill="#171922" stroke="#262936"/>
+    <text x="896" y="155" fill="#9aa0b4">4</text>
+    <line x1="912" y1="150" x2="1052" y2="150" stroke="#262936" stroke-width="2"/>
+    <circle cx="1068" cy="150" r="16" fill="#171922" stroke="#262936"/>
+    <text x="1068" y="155" fill="#9aa0b4">5</text>
+    <line x1="1084" y1="150" x2="1224" y2="150" stroke="#262936" stroke-width="2"/>
+    <circle cx="1240" cy="150" r="16" fill="#171922" stroke="#262936"/>
+    <text x="1240" y="155" fill="#9aa0b4">6</text>
+    <text x="380" y="182" fill="#9aa0b4" font-weight="400">Welcome</text>
+    <text x="552" y="182" fill="#9aa0b4" font-weight="400">You</text>
+    <text x="724" y="182" fill="#8b7dff" font-weight="400">Storage</text>
+    <text x="896" y="182" fill="#6b7285" font-weight="400">Folders</text>
+    <text x="1068" y="182" fill="#6b7285" font-weight="400">Check</text>
+    <text x="1240" y="182" fill="#6b7285" font-weight="400">Create</text>
+  </g>
+
+  <text x="800" y="270" fill="#e7e9f2" font-size="30" font-weight="700" text-anchor="middle">Where should your assets live?</text>
+  <text x="800" y="302" fill="#9aa0b4" font-size="15" text-anchor="middle">You can change this later. Offline-first is the default.</text>
+
+  <!-- Option 1 (selected) -->
+  <rect x="240" y="350" width="360" height="240" rx="16" fill="#15161d" stroke="#8b7dff" stroke-width="2"/>
+  <rect x="264" y="374" width="44" height="44" rx="11" fill="#1e1b3a"/>
+  <path d="M276 388h10l4 6h12v16h-26z" fill="none" stroke="#8b7dff" stroke-width="2"/>
+  <circle cx="576" cy="374" r="11" fill="#8b7dff"/>
+  <path d="M571 374l4 4 7-8" stroke="#0f1014" stroke-width="2" fill="none"/>
+  <text x="264" y="452" fill="#e7e9f2" font-size="18" font-weight="600">Just this PC</text>
+  <text x="264" y="480" fill="#9aa0b4" font-size="13">Fastest. Everything stays on this</text>
+  <text x="264" y="500" fill="#9aa0b4" font-size="13">machine, fully offline.</text>
+  <rect x="264" y="524" width="120" height="24" rx="12" fill="#1e1b3a"/>
+  <text x="324" y="540" fill="#8b7dff" font-size="11" text-anchor="middle">Recommended</text>
+
+  <!-- Option 2 -->
+  <rect x="620" y="350" width="360" height="240" rx="16" fill="#15161d" stroke="#262936"/>
+  <rect x="644" y="374" width="44" height="44" rx="11" fill="#171922"/>
+  <rect x="656" y="392" width="20" height="10" rx="2" fill="none" stroke="#2dd4bf" stroke-width="2"/>
+  <text x="644" y="452" fill="#e7e9f2" font-size="18" font-weight="600">This PC + studio NAS</text>
+  <text x="644" y="480" fill="#9aa0b4" font-size="13">Keeps a shared copy on your</text>
+  <text x="644" y="500" fill="#9aa0b4" font-size="13">network drive or Git server.</text>
+
+  <!-- Option 3 -->
+  <rect x="1000" y="350" width="360" height="240" rx="16" fill="#15161d" stroke="#262936"/>
+  <rect x="1024" y="374" width="44" height="44" rx="11" fill="#171922"/>
+  <circle cx="1046" cy="390" r="6" fill="none" stroke="#8b7dff" stroke-width="2"/>
+  <circle cx="1039" cy="402" r="6" fill="none" stroke="#8b7dff" stroke-width="2"/>
+  <text x="1024" y="452" fill="#e7e9f2" font-size="18" font-weight="600">Join studio space</text>
+  <text x="1024" y="480" fill="#9aa0b4" font-size="13">Clone a space a teammate already</text>
+  <text x="1024" y="500" fill="#9aa0b4" font-size="13">shares on the network.</text>
+
+  <!-- Footer nav -->
+  <line x1="240" y1="700" x2="1360" y2="700" stroke="#262936"/>
+  <rect x="240" y="740" width="140" height="48" rx="10" fill="#171922" stroke="#262936"/>
+  <text x="310" y="770" fill="#c8ccdb" font-size="14" text-anchor="middle">← Back</text>
+  <rect x="1220" y="740" width="140" height="48" rx="10" fill="#8b7dff"/>
+  <text x="1290" y="770" fill="#0f1014" font-size="14" font-weight="600" text-anchor="middle">Continue →</text>
+  <text x="800" y="770" fill="#6b7285" font-size="12" text-anchor="middle">Step 3 of 6 · Nothing leaves your machine without your say-so</text>
+</svg>

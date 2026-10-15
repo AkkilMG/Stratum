@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="1600" height="900" fill="#0f1014"/>
+
+  <!-- App sidebar -->
+  <rect x="0" y="0" width="260" height="900" fill="#121319"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#262936"/>
+  <circle cx="40" cy="44" r="14" fill="#8b7dff"/>
+  <text x="64" y="50" fill="#e7e9f2" font-size="17" font-weight="600">Stratum</text>
+  <g font-size="15" fill="#9aa0b4">
+    <text x="46" y="110">Overview</text><circle cx="30" cy="105" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="158">Library</text><circle cx="30" cy="153" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="206">History &amp; sync</text><circle cx="30" cy="201" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="254">Add files…</text><circle cx="30" cy="249" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <rect x="14" y="278" width="232" height="38" rx="8" fill="#1e1b3a"/>
+    <text x="46" y="302" fill="#e7e9f2" font-weight="600">Settings</text><circle cx="30" cy="297" r="5" fill="#8b7dff"/>
+  </g>
+
+  <text x="300" y="90" fill="#e7e9f2" font-size="26" font-weight="700">Settings</text>
+
+  <!-- Band list -->
+  <g font-size="14">
+    <rect x="300" y="130" width="240" height="42" rx="10" fill="#1e1b3a"/><text x="322" y="156" fill="#e7e9f2" font-weight="600">This space</text>
+    <text x="322" y="206" fill="#9aa0b4">You</text>
+    <text x="322" y="254" fill="#9aa0b4">Local AI</text>
+    <text x="322" y="302" fill="#9aa0b4">Help &amp; about</text>
+    <text x="322" y="350" fill="#9aa0b4">Updates</text>
+    <text x="322" y="398" fill="#9aa0b4">Community</text>
+  </g>
+
+  <!-- Content -->
+  <!-- Stat tiles -->
+  <g>
+    <rect x="580" y="130" width="300" height="110" rx="12" fill="#15161d" stroke="#262936"/>
+    <text x="604" y="176" fill="#9aa0b4" font-size="12">Assets</text>
+    <text x="604" y="210" fill="#e7e9f2" font-size="26" font-weight="700">12,480</text>
+
+    <rect x="900" y="130" width="300" height="110" rx="12" fill="#15161d" stroke="#262936"/>
+    <text x="924" y="176" fill="#9aa0b4" font-size="12">Storage used</text>
+    <text x="924" y="210" fill="#e7e9f2" font-size="26" font-weight="700">4.2 GB</text>
+
+    <rect x="1220" y="130" width="300" height="110" rx="12" fill="#15161d" stroke="#262936"/>
+    <text x="1244" y="176" fill="#9aa0b4" font-size="12">Versions saved</text>
+    <text x="1244" y="210" fill="#e7e9f2" font-size="26" font-weight="700">38,912</text>
+  </g>
+
+  <!-- Storage section -->
+  <text x="580" y="296" fill="#e7e9f2" font-size="16" font-weight="600">Storage</text>
+  <rect x="580" y="312" width="940" height="150" rx="12" fill="#15161d" stroke="#262936"/>
+  <circle cx="616" cy="352" r="12" fill="#1e1b3a"/>
+  <path d="M606 352h20M606 358h20" stroke="#8b7dff" stroke-width="2"/>
+  <text x="644" y="348" fill="#e7e9f2" font-size="14" font-weight="600">Local folder</text>
+  <text x="644" y="368" fill="#9aa0b4" font-size="12" font-family="ui-monospace, monospace">D:\Studio\Art</text>
+  <rect x="1360" y="336" width="136" height="32" rx="8" fill="#171922" stroke="#262936"/>
+  <text x="1428" y="357" fill="#c8ccdb" font-size="12" text-anchor="middle">Copy path</text>
+  <line x1="604" y1="392" x2="1496" y2="392" stroke="#262936"/>
+  <circle cx="616" cy="424" r="12" fill="#0e3f3a"/>
+  <path d="M610 430l6-14 6 14z" fill="none" stroke="#2dd4bf" stroke-width="2"/>
+  <text x="644" y="420" fill="#e7e9f2" font-size="14" font-weight="600">Studio NAS remote</text>
+  <text x="644" y="440" fill="#9aa0b4" font-size="12" font-family="ui-monospace, monospace">\\NAS\studio\stratum\art.git</text>
+  <rect x="1360" y="408" width="136" height="32" rx="8" fill="#171922" stroke="#262936"/>
+  <text x="1428" y="429" fill="#c8ccdb" font-size="12" text-anchor="middle">Change</text>
+
+  <!-- Appearance + profile preview -->
+  <text x="580" y="514" fill="#e7e9f2" font-size="16" font-weight="600">Profile &amp; appearance</text>
+  <rect x="580" y="530" width="940" height="130" rx="12" fill="#15161d" stroke="#262936"/>
+  <circle cx="626" cy="575" r="20" fill="#1e1b3a"/>
+  <text x="626" y="581" fill="#8b7dff" font-size="15" text-anchor="middle" font-weight="600">A</text>
+  <text x="660" y="570" fill="#e7e9f2" font-size="14" font-weight="600">Akkil M G</text>
+  <text x="660" y="590" fill="#9aa0b4" font-size="12">Shown in version history</text>
+  <line x1="604" y1="612" x2="1496" y2="612" stroke="#262936"/>
+  <text x="604" y="640" fill="#9aa0b4" font-size="12">Appearance</text>
+  <g font-size="12">
+    <rect x="1040" y="620" width="90" height="32" rx="8" fill="#171922" stroke="#262936"/><text x="1085" y="641" fill="#c8ccdb" text-anchor="middle">System</text>
+    <rect x="1138" y="620" width="90" height="32" rx="8" fill="#171922" stroke="#262936"/><text x="1183" y="641" fill="#c8ccdb" text-anchor="middle">Light</text>
+    <rect x="1236" y="620" width="90" height="32" rx="8" fill="#1e1b3a"/><text x="1281" y="641" fill="#8b7dff" text-anchor="middle">Dark</text>
+  </g>
+  <text x="1348" y="641" fill="#9aa0b4" font-size="12">Language</text>
+  <rect x="1420" y="620" width="76" height="32" rx="8" fill="#171922" stroke="#262936"/>
+  <text x="1458" y="641" fill="#c8ccdb" font-size="12" text-anchor="middle">EN ▾</text>
+</svg>

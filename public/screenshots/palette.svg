@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="1600" height="900" fill="#0f1014"/>
+  <!-- dimmed app -->
+  <rect x="0" y="0" width="260" height="900" fill="#121319" opacity="0.5"/>
+  <rect x="260" y="0" width="1340" height="900" fill="#0f1014" opacity="0.0"/>
+  <rect width="1600" height="900" fill="#0f1014" opacity="0.62"/>
+
+  <!-- Palette -->
+  <rect x="460" y="150" width="680" height="600" rx="16" fill="#15161d" stroke="#262936"/>
+  <line x1="460" y1="212" x2="1140" y2="212" stroke="#262936"/>
+  <circle cx="492" cy="181" r="7" fill="none" stroke="#9aa0b4" stroke-width="2"/>
+  <text x="514" y="186" fill="#e7e9f2" font-size="14">sync</text>
+  <rect x="1040" y="164" width="76" height="30" rx="7" fill="#171922" stroke="#262936"/>
+  <text x="1078" y="184" fill="#9aa0b4" font-size="11" text-anchor="middle">Esc</text>
+
+  <text x="484" y="248" fill="#6b7285" font-size="11" font-weight="600" letter-spacing="1">ACTIONS</text>
+  <g font-size="14">
+    <rect x="476" y="258" width="648" height="44" rx="9" fill="#1e1b3a"/>
+    <circle cx="504" cy="280" r="5" fill="#8b7dff"/>
+    <text x="524" y="285" fill="#e7e9f2" font-weight="600">Sync now</text>
+    <text x="1104" y="285" fill="#9aa0b4" font-size="11" text-anchor="end">Push &amp; pull with the studio remote</text>
+
+    <rect x="476" y="308" width="648" height="44" rx="9" fill="none"/>
+    <circle cx="504" cy="330" r="5" fill="#4b5163"/>
+    <text x="524" y="335" fill="#c8ccdb">Change remote…</text>
+    <text x="1104" y="335" fill="#9aa0b4" font-size="11" text-anchor="end">Connect a NAS or Git server</text>
+
+    <circle cx="504" cy="380" r="5" fill="#4b5163"/>
+    <text x="524" y="385" fill="#c8ccdb">Go to Library</text>
+    <text x="1104" y="385" fill="#9aa0b4" font-size="11" text-anchor="end">Browse assets</text>
+
+    <circle cx="504" cy="430" r="5" fill="#4b5163"/>
+    <text x="524" y="435" fill="#c8ccdb">Go to History &amp; sync</text>
+    <text x="1104" y="435" fill="#9aa0b4" font-size="11" text-anchor="end">Timeline &amp; status</text>
+
+    <circle cx="504" cy="480" r="5" fill="#4b5163"/>
+    <text x="524" y="485" fill="#c8ccdb">Open Settings</text>
+    <text x="1104" y="485" fill="#9aa0b4" font-size="11" text-anchor="end">Preferences</text>
+
+    <circle cx="504" cy="530" r="5" fill="#4b5163"/>
+    <text x="524" y="535" fill="#c8ccdb">Replay the tour</text>
+    <text x="1104" y="535" fill="#9aa0b4" font-size="11" text-anchor="end">60-second walkthrough</text>
+
+    <circle cx="504" cy="580" r="5" fill="#4b5163"/>
+    <text x="524" y="585" fill="#c8ccdb">Add files…</text>
+    <text x="1104" y="585" fill="#9aa0b4" font-size="11" text-anchor="end">Import into this space</text>
+
+    <circle cx="504" cy="630" r="5" fill="#4b5163"/>
+    <text x="524" y="635" fill="#c8ccdb">About Stratum</text>
+    <text x="1104" y="635" fill="#9aa0b4" font-size="11" text-anchor="end">Version 0.1.0</text>
+  </g>
+
+  <!-- Footer hints -->
+  <line x1="460" y1="700" x2="1140" y2="700" stroke="#262936"/>
+  <g font-size="11" fill="#9aa0b4">
+    <text x="484" y="724">↑↓ navigate</text>
+    <text x="620" y="724">↵ open</text>
+    <text x="724" y="724">Esc close</text>
+    <text x="1116" y="724" text-anchor="end">Powered by ⌘K</text>
+  </g>
+</svg>

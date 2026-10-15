@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="s1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a3b1e"/><stop offset="1" stop-color="#e0a83a"/></linearGradient>
+    <linearGradient id="s2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b3d1f"/><stop offset="1" stop-color="#c9772e"/></linearGradient>
+    <linearGradient id="s3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a2f16"/><stop offset="1" stop-color="#fbbf24"/></linearGradient>
+    <linearGradient id="s4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b2f6b"/><stop offset="1" stop-color="#8b7dff"/></linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="#0f1014"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="260" height="900" fill="#121319"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#262936"/>
+  <circle cx="40" cy="44" r="14" fill="#8b7dff"/>
+  <text x="64" y="50" fill="#e7e9f2" font-size="17" font-weight="600">Stratum</text>
+  <g font-size="15" fill="#9aa0b4">
+    <text x="46" y="110">Overview</text><circle cx="30" cy="105" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <rect x="14" y="134" width="232" height="38" rx="8" fill="#1e1b3a"/>
+    <text x="46" y="158" fill="#e7e9f2" font-weight="600">Library</text><circle cx="30" cy="153" r="5" fill="#8b7dff"/>
+    <text x="46" y="206">History &amp; sync</text><circle cx="30" cy="201" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="254">Add files…</text><circle cx="30" cy="249" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="302">Settings</text><circle cx="30" cy="297" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+  </g>
+
+  <!-- Top bar with active search -->
+  <rect x="260" y="0" width="1340" height="64" fill="#0f1014"/>
+  <line x1="260" y1="64" x2="1600" y2="64" stroke="#262936"/>
+  <rect x="292" y="16" width="640" height="34" rx="8" fill="#171922" stroke="#8b7dff"/>
+  <circle cx="314" cy="33" r="7" fill="none" stroke="#8b7dff" stroke-width="2"/>
+  <line x1="319" y1="38" x2="324" y2="43" stroke="#8b7dff" stroke-width="2"/>
+  <text x="336" y="38" fill="#e7e9f2" font-size="13">red desert sector map</text>
+  <rect x="900" y="16" width="60" height="32" rx="8" fill="#171922" stroke="#262936"/>
+  <text x="930" y="37" fill="#9aa0b4" font-size="12" text-anchor="middle">Esc</text>
+
+  <!-- AI badge -->
+  <rect x="292" y="74" width="430" height="34" rx="8" fill="#0e3f3a"/>
+  <text x="308" y="96" fill="#2dd4bf" font-size="12">✦ Semantic search · nomic-embed-text · 6 matches, best first</text>
+
+  <!-- Result cards row 1 -->
+  <g>
+    <rect x="300" y="140" width="290" height="240" rx="12" fill="#15161d" stroke="#8b7dff" stroke-width="1.5"/>
+    <rect x="312" y="152" width="266" height="150" rx="8" fill="url(#s1)"/>
+    <rect x="312" y="152" width="70" height="24" rx="6" fill="#0f1014" opacity="0.7"/>
+    <text x="347" y="169" fill="#2dd4bf" font-size="12" font-weight="600" text-anchor="middle">98%</text>
+    <text x="312" y="326" fill="#e7e9f2" font-size="14" font-weight="600">desert_plateau.tif</text>
+    <text x="312" y="346" fill="#9aa0b4" font-size="11">tags: desert · red · terrain</text>
+
+    <rect x="610" y="140" width="290" height="240" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="622" y="152" width="266" height="150" rx="8" fill="url(#s2)"/>
+    <rect x="622" y="152" width="70" height="24" rx="6" fill="#0f1014" opacity="0.7"/>
+    <text x="657" y="169" fill="#2dd4bf" font-size="12" font-weight="600" text-anchor="middle">91%</text>
+    <text x="622" y="326" fill="#e7e9f2" font-size="14" font-weight="600">sector_overview.png</text>
+    <text x="622" y="346" fill="#9aa0b4" font-size="11">tags: sector · overhead</text>
+
+    <rect x="920" y="140" width="290" height="240" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="932" y="152" width="266" height="150" rx="8" fill="url(#s3)"/>
+    <rect x="932" y="152" width="70" height="24" rx="6" fill="#0f1014" opacity="0.7"/>
+    <text x="967" y="169" fill="#2dd4bf" font-size="12" font-weight="600" text-anchor="middle">84%</text>
+    <text x="932" y="326" fill="#e7e9f2" font-size="14" font-weight="600">canyon_map_v4.png</text>
+    <text x="932" y="346" fill="#9aa0b4" font-size="11">tags: canyon · layout</text>
+
+    <rect x="1230" y="140" width="290" height="240" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="1242" y="152" width="266" height="150" rx="8" fill="url(#s4)"/>
+    <rect x="1242" y="152" width="70" height="24" rx="6" fill="#0f1014" opacity="0.7"/>
+    <text x="1277" y="169" fill="#2dd4bf" font-size="12" font-weight="600" text-anchor="middle">72%</text>
+    <text x="1242" y="326" fill="#e7e9f2" font-size="14" font-weight="600">biome_redrock.svg</text>
+    <text x="1242" y="346" fill="#9aa0b4" font-size="11">tags: red · rock</text>
+  </g>
+
+  <!-- Result cards row 2 -->
+  <g>
+    <rect x="300" y="400" width="290" height="240" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="312" y="412" width="266" height="150" rx="8" fill="url(#s2)"/>
+    <rect x="312" y="412" width="70" height="24" rx="6" fill="#0f1014" opacity="0.7"/>
+    <text x="347" y="429" fill="#2dd4bf" font-size="12" font-weight="600" text-anchor="middle">65%</text>
+    <text x="312" y="586" fill="#e7e9f2" font-size="14" font-weight="600">dune_heightmap.tif</text>
+    <text x="312" y="606" fill="#9aa0b4" font-size="11">tags: dune · height</text>
+
+    <rect x="610" y="400" width="290" height="240" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="622" y="412" width="266" height="150" rx="8" fill="url(#s1)"/>
+    <rect x="622" y="412" width="70" height="24" rx="6" fill="#0f1014" opacity="0.7"/>
+    <text x="657" y="429" fill="#2dd4bf" font-size="12" font-weight="600" text-anchor="middle">58%</text>
+    <text x="622" y="586" fill="#e7e9f2" font-size="14" font-weight="600">wasteland_tile.png</text>
+    <text x="622" y="606" fill="#9aa0b4" font-size="11">tags: wasteland</text>
+  </g>
+
+  <text x="920" y="440" fill="#6b7285" font-size="13">Keyword fallback also runs when local AI is offline —</text>
+  <text x="920" y="462" fill="#6b7285" font-size="13">matching on file names and tags.</text>
+</svg>

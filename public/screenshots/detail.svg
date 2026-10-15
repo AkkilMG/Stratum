@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="dt1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a2f16"/><stop offset="1" stop-color="#fbbf24"/></linearGradient>
+    <linearGradient id="dt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a2a12"/><stop offset="1" stop-color="#c98a1e"/></linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="#0f1014"/>
+
+  <!-- Dimmed library behind -->
+  <rect x="0" y="0" width="880" height="900" fill="#0f1014"/>
+  <rect x="0" y="0" width="260" height="900" fill="#121319" opacity="0.6"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#262936" opacity="0.6"/>
+  <g opacity="0.45">
+    <rect x="300" y="196" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="300" y="426" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="610" y="196" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+    <rect x="610" y="426" width="290" height="210" rx="12" fill="#15161d" stroke="#262936"/>
+  </g>
+  <rect x="0" y="0" width="880" height="900" fill="#0f1014" opacity="0.55"/>
+
+  <!-- Drawer -->
+  <rect x="880" y="0" width="720" height="900" fill="#15161d"/>
+  <line x1="880" y1="0" x2="880" y2="900" stroke="#262936"/>
+  <text x="912" y="52" fill="#e7e9f2" font-size="20" font-weight="700">hero_armor.psd</text>
+  <text x="912" y="74" fill="#9aa0b4" font-size="12">Source file · Updated 2 hours ago by Akkil M G</text>
+  <g stroke="#9aa0b4" stroke-width="2"><line x1="1548" y1="40" x2="1564" y2="56"/><line x1="1564" y1="40" x2="1548" y2="56"/></g>
+
+  <!-- Preview compare -->
+  <text x="912" y="108" fill="#9aa0b4" font-size="11" font-weight="600" letter-spacing="1">CURRENT</text>
+  <text x="1240" y="108" fill="#9aa0b4" font-size="11" font-weight="600" letter-spacing="1">VERSION · 2h AGO</text>
+  <rect x="912" y="120" width="308" height="180" rx="10" fill="url(#dt1)"/>
+  <circle cx="1066" cy="210" r="46" fill="#0f1014" opacity="0.22"/>
+  <rect x="1240" y="120" width="308" height="180" rx="10" fill="url(#dt2)"/>
+  <circle cx="1394" cy="210" r="40" fill="#0f1014" opacity="0.22"/>
+
+  <!-- Metadata -->
+  <g font-size="13">
+    <rect x="912" y="320" width="636" height="1" fill="#262936"/>
+    <text x="912" y="352" fill="#9aa0b4">Type</text><text x="1060" y="352" fill="#e7e9f2">Photoshop source</text>
+    <text x="1240" y="352" fill="#9aa0b4">Size</text><text x="1330" y="352" fill="#e7e9f2">156.4 MB</text>
+    <text x="912" y="382" fill="#9aa0b4">Path</text><text x="1060" y="382" fill="#e7e9f2" font-family="ui-monospace, monospace">Textures/Characters/</text>
+    <text x="1240" y="382" fill="#9aa0b4">Versions</text><text x="1330" y="382" fill="#e7e9f2">7</text>
+  </g>
+
+  <!-- Tags -->
+  <text x="912" y="424" fill="#e7e9f2" font-size="14" font-weight="600">Tags</text>
+  <g font-size="12">
+    <rect x="912" y="438" width="82" height="28" rx="14" fill="#1e1b3a"/><text x="953" y="456" fill="#8b7dff" text-anchor="middle">character</text>
+    <rect x="1002" y="438" width="74" height="28" rx="14" fill="#1e1b3a"/><text x="1039" y="456" fill="#8b7dff" text-anchor="middle">armor ×</text>
+    <rect x="1084" y="438" width="90" height="28" rx="14" fill="#0e3f3a"/><text x="1129" y="456" fill="#2dd4bf" text-anchor="middle">✦ ai: golden</text>
+    <rect x="1182" y="438" width="98" height="28" rx="14" fill="#0e3f3a"/><text x="1231" y="456" fill="#2dd4bf" text-anchor="middle">✦ ai: ornate</text>
+    <rect x="1288" y="438" width="96" height="28" rx="14" fill="none" stroke="#262936"/><text x="1336" y="456" fill="#9aa0b4" text-anchor="middle">+ Add tag</text>
+  </g>
+
+  <!-- Version history -->
+  <text x="912" y="508" fill="#e7e9f2" font-size="14" font-weight="600">Version history</text>
+  <g font-size="13">
+    <rect x="912" y="522" width="636" height="64" rx="10" fill="#121319" stroke="#262936"/>
+    <circle cx="942" cy="554" r="6" fill="#8b7dff"/>
+    <text x="962" y="548" fill="#e7e9f2" font-weight="600">a1f9c2e</text><text x="962" y="568" fill="#9aa0b4" font-size="11">2 hours ago · Akkil M G</text>
+    <text x="1360" y="556" fill="#8b7dff" font-size="12">Current</text>
+
+    <rect x="912" y="596" width="636" height="64" rx="10" fill="#121319" stroke="#262936"/>
+    <circle cx="942" cy="628" r="6" fill="#4b5163"/>
+    <text x="962" y="622" fill="#e7e9f2" font-weight="600">7d31b04</text><text x="962" y="642" fill="#9aa0b4" font-size="11">Yesterday · Maya R.</text>
+    <rect x="1400" y="612" width="128" height="32" rx="8" fill="#171922" stroke="#262936"/>
+    <text x="1464" y="633" fill="#c8ccdb" font-size="12" text-anchor="middle">Restore</text>
+
+    <rect x="912" y="670" width="636" height="64" rx="10" fill="#121319" stroke="#262936"/>
+    <circle cx="942" cy="702" r="6" fill="#4b5163"/>
+    <text x="962" y="696" fill="#e7e9f2" font-weight="600">3c05aa1</text><text x="962" y="716" fill="#9aa0b4" font-size="11">3 days ago · Akkil M G</text>
+    <rect x="1400" y="686" width="128" height="32" rx="8" fill="#171922" stroke="#262936"/>
+    <text x="1464" y="707" fill="#c8ccdb" font-size="12" text-anchor="middle">Restore</text>
+
+    <rect x="912" y="744" width="636" height="64" rx="10" fill="#121319" stroke="#262936"/>
+    <circle cx="942" cy="776" r="6" fill="#4b5163"/>
+    <text x="962" y="770" fill="#e7e9f2" font-weight="600">0be17f8</text><text x="962" y="790" fill="#9aa0b4" font-size="11">1 week ago · Imported</text>
+    <rect x="1400" y="760" width="128" height="32" rx="8" fill="#171922" stroke="#262936"/>
+    <text x="1464" y="781" fill="#c8ccdb" font-size="12" text-anchor="middle">Restore</text>
+  </g>
+</svg>

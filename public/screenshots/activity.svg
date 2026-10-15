@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="1600" height="900" fill="#0f1014"/>
+
+  <!-- Sidebar -->
+  <rect x="0" y="0" width="260" height="900" fill="#121319"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#262936"/>
+  <circle cx="40" cy="44" r="14" fill="#8b7dff"/>
+  <text x="64" y="50" fill="#e7e9f2" font-size="17" font-weight="600">Stratum</text>
+  <g font-size="15" fill="#9aa0b4">
+    <text x="46" y="110">Overview</text><circle cx="30" cy="105" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="158">Library</text><circle cx="30" cy="153" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <rect x="14" y="182" width="232" height="38" rx="8" fill="#1e1b3a"/>
+    <text x="46" y="206" fill="#e7e9f2" font-weight="600">History &amp; sync</text><circle cx="30" cy="201" r="5" fill="#8b7dff"/>
+    <text x="46" y="254">Add files…</text><circle cx="30" cy="249" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="302">Settings</text><circle cx="30" cy="297" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+  </g>
+  <rect x="14" y="740" width="232" height="52" rx="10" fill="#15161d" stroke="#262936"/>
+  <circle cx="40" cy="766" r="12" fill="#1e1b3a"/>
+  <text x="60" y="762" fill="#e7e9f2" font-size="13" font-weight="600">Studio Art</text>
+  <text x="60" y="780" fill="#9aa0b4" font-size="11">D:\Studio\Art</text>
+
+  <!-- Top bar -->
+  <rect x="260" y="0" width="1340" height="64" fill="#0f1014"/>
+  <line x1="260" y1="64" x2="1600" y2="64" stroke="#262936"/>
+  <rect x="292" y="16" width="420" height="32" rx="8" fill="#171922" stroke="#262936"/>
+  <circle cx="314" cy="32" r="7" fill="none" stroke="#9aa0b4" stroke-width="2"/>
+  <text x="336" y="37" fill="#6b7285" font-size="13">Search by meaning…</text>
+
+  <text x="300" y="118" fill="#e7e9f2" font-size="26" font-weight="700">History &amp; sync</text>
+
+  <!-- Timeline -->
+  <text x="300" y="160" fill="#e7e9f2" font-size="15" font-weight="600">Activity</text>
+  <g>
+    <line x1="316" y1="186" x2="316" y2="820" stroke="#262936" stroke-width="2"/>
+    <circle cx="316" cy="200" r="6" fill="#8b7dff"/>
+    <text x="340" y="196" fill="#e7e9f2" font-size="14" font-weight="600">Updated hero_armor.psd</text>
+    <text x="340" y="216" fill="#9aa0b4" font-size="11">Akkil M G · 2h ago · a1f9c2e</text>
+
+    <circle cx="316" cy="272" r="6" fill="#34d399"/>
+    <text x="340" y="268" fill="#e7e9f2" font-size="14" font-weight="600">Added desert_plateau.tif</text>
+    <text x="340" y="288" fill="#9aa0b4" font-size="11">Akkil M G · 3h ago · 44b21d0</text>
+
+    <circle cx="316" cy="344" r="6" fill="#8b7dff"/>
+    <text x="340" y="340" fill="#e7e9f2" font-size="14" font-weight="600">Restored sector_map.png (v3)</text>
+    <text x="340" y="360" fill="#9aa0b4" font-size="11">Maya R. · 5h ago · 7d31b04</text>
+
+    <circle cx="316" cy="416" r="6" fill="#f87171"/>
+    <text x="340" y="412" fill="#e7e9f2" font-size="14" font-weight="600">Removed old_crate_01.tga</text>
+    <text x="340" y="432" fill="#9aa0b4" font-size="11">Maya R. · Yesterday · 3c05aa1</text>
+
+    <circle cx="316" cy="488" r="6" fill="#34d399"/>
+    <text x="340" y="484" fill="#e7e9f2" font-size="14" font-weight="600">Imported 42 files</text>
+    <text x="340" y="504" fill="#9aa0b4" font-size="11">Akkil M G · 2 days ago · 0be17f8</text>
+  </g>
+
+  <!-- Sync panel -->
+  <rect x="820" y="140" width="700" height="500" rx="16" fill="#15161d" stroke="#262936"/>
+  <text x="856" y="182" fill="#e7e9f2" font-size="17" font-weight="600">Team sync</text>
+  <rect x="856" y="200" width="120" height="26" rx="13" fill="#0e3f3a"/>
+  <circle cx="874" cy="213" r="4" fill="#34d399"/>
+  <text x="888" y="217" fill="#34d399" font-size="12">Connected</text>
+
+  <text x="856" y="266" fill="#9aa0b4" font-size="12">Remote</text>
+  <rect x="856" y="278" width="628" height="40" rx="8" fill="#171922" stroke="#262936"/>
+  <text x="874" y="303" fill="#c8ccdb" font-size="13" font-family="ui-monospace, monospace">\\NAS\studio\stratum\art.git</text>
+
+  <g font-size="13">
+    <text x="856" y="360" fill="#9aa0b4">Status</text><text x="1120" y="360" fill="#e7e9f2">Up to date</text>
+    <text x="856" y="390" fill="#9aa0b4">Last sync</text><text x="1120" y="390" fill="#e7e9f2">4 minutes ago</text>
+    <text x="856" y="420" fill="#9aa0b4">Waiting to sync</text><text x="1120" y="420" fill="#e7e9f2">0 changes</text>
+    <text x="856" y="450" fill="#9aa0b4">Shared with</text><text x="1120" y="450" fill="#e7e9f2">4 teammates</text>
+  </g>
+  <rect x="856" y="480" width="628" height="1" fill="#262936"/>
+
+  <rect x="856" y="510" width="160" height="44" rx="10" fill="#8b7dff"/>
+  <text x="936" y="537" fill="#0f1014" font-size="14" font-weight="600" text-anchor="middle">⟳  Sync now</text>
+  <rect x="1028" y="510" width="180" height="44" rx="10" fill="#171922" stroke="#262936"/>
+  <text x="1118" y="537" fill="#c8ccdb" font-size="14" text-anchor="middle">Change remote</text>
+  <text x="856" y="590" fill="#6b7285" font-size="12">Background sync runs every 120 seconds while a remote is connected.</text>
+</svg>

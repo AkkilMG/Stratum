@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="1600" height="900" fill="#0f1014"/>
+
+  <!-- App sidebar -->
+  <rect x="0" y="0" width="260" height="900" fill="#121319"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#262936"/>
+  <circle cx="40" cy="44" r="14" fill="#8b7dff"/>
+  <text x="64" y="50" fill="#e7e9f2" font-size="17" font-weight="600">Stratum</text>
+  <g font-size="15" fill="#9aa0b4">
+    <text x="46" y="110">Overview</text><circle cx="30" cy="105" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="158">Library</text><circle cx="30" cy="153" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="206">History &amp; sync</text><circle cx="30" cy="201" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <text x="46" y="254">Add files…</text><circle cx="30" cy="249" r="5" fill="none" stroke="#4b5163" stroke-width="2"/>
+    <rect x="14" y="278" width="232" height="38" rx="8" fill="#1e1b3a"/>
+    <text x="46" y="302" fill="#e7e9f2" font-weight="600">Settings</text><circle cx="30" cy="297" r="5" fill="#8b7dff"/>
+  </g>
+
+  <text x="300" y="90" fill="#e7e9f2" font-size="26" font-weight="700">Settings</text>
+
+  <!-- Band list -->
+  <g font-size="14">
+    <text x="322" y="156" fill="#9aa0b4">This space</text>
+    <text x="322" y="206" fill="#9aa0b4">You</text>
+    <rect x="300" y="230" width="240" height="42" rx="10" fill="#1e1b3a"/><text x="322" y="256" fill="#e7e9f2" font-weight="600">Local AI</text>
+    <text x="322" y="306" fill="#9aa0b4">Help &amp; about</text>
+    <text x="322" y="354" fill="#9aa0b4">Updates</text>
+  </g>
+
+  <text x="580" y="130" fill="#e7e9f2" font-size="18" font-weight="700">Local AI</text>
+  <text x="580" y="154" fill="#9aa0b4" font-size="13">Optional. Everything runs on your machine via Ollama.</text>
+
+  <!-- System check rows -->
+  <g>
+    <rect x="580" y="180" width="940" height="80" rx="12" fill="#15161d" stroke="#262936"/>
+    <circle cx="620" cy="220" r="14" fill="#0e3f3a"/><path d="M613 220l5 5 9-10" stroke="#34d399" stroke-width="2" fill="none"/>
+    <text x="650" y="214" fill="#e7e9f2" font-size="15" font-weight="600">Git</text>
+    <text x="650" y="236" fill="#9aa0b4" font-size="12">Required · found git 2.44.0</text>
+    <rect x="1380" y="202" width="116" height="34" rx="8" fill="#0e3f3a"/>
+    <text x="1438" y="224" fill="#34d399" font-size="12" text-anchor="middle">Ready</text>
+
+    <rect x="580" y="272" width="940" height="80" rx="12" fill="#15161d" stroke="#262936"/>
+    <circle cx="620" cy="312" r="14" fill="#0e3f3a"/><path d="M613 312l5 5 9-10" stroke="#34d399" stroke-width="2" fill="none"/>
+    <text x="650" y="306" fill="#e7e9f2" font-size="15" font-weight="600">Ollama</text>
+    <text x="650" y="328" fill="#9aa0b4" font-size="12">Running at localhost:11434</text>
+    <rect x="1380" y="294" width="116" height="34" rx="8" fill="#0e3f3a"/>
+    <text x="1438" y="316" fill="#34d399" font-size="12" text-anchor="middle">Ready</text>
+
+    <rect x="580" y="364" width="940" height="80" rx="12" fill="#15161d" stroke="#262936"/>
+    <circle cx="620" cy="404" r="14" fill="#1e1b3a"/><circle cx="620" cy="404" r="5" fill="#8b7dff"/>
+    <text x="650" y="398" fill="#e7e9f2" font-size="15" font-weight="600">llava:7b — vision tagging</text>
+    <text x="650" y="420" fill="#9aa0b4" font-size="12">Describes image assets and suggests tags</text>
+    <rect x="1360" y="386" width="156" height="34" rx="8" fill="#8b7dff"/>
+    <text x="1438" y="408" fill="#0f1014" font-size="12" font-weight="600" text-anchor="middle">Download model</text>
+
+    <rect x="580" y="456" width="940" height="80" rx="12" fill="#15161d" stroke="#262936"/>
+    <circle cx="620" cy="496" r="14" fill="#1e1b3a"/><circle cx="620" cy="496" r="5" fill="#8b7dff"/>
+    <text x="650" y="490" fill="#e7e9f2" font-size="15" font-weight="600">nomic-embed-text — embeddings</text>
+    <text x="650" y="512" fill="#9aa0b4" font-size="12">Powers semantic search ("find by meaning")</text>
+    <rect x="1360" y="478" width="156" height="34" rx="8" fill="#8b7dff"/>
+    <text x="1438" y="500" fill="#0f1014" font-size="12" font-weight="600" text-anchor="middle">Download model</text>
+  </g>
+
+  <!-- Note -->
+  <rect x="580" y="560" width="940" height="56" rx="10" fill="#171922" stroke="#262936"/>
+  <text x="600" y="584" fill="#2dd4bf" font-size="12" font-weight="600">i  Offline-safe</text>
+  <text x="600" y="604" fill="#9aa0b4" font-size="12">Without models, keyword search still works — AI simply enhances it.</text>
+  <rect x="580" y="636" width="180" height="40" rx="9" fill="#171922" stroke="#262936"/>
+  <text x="670" y="662" fill="#c8ccdb" font-size="13" text-anchor="middle">⟳  Re-check</text>
+</svg>
