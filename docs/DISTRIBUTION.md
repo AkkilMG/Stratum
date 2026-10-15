@@ -24,7 +24,7 @@ channel either points at those assets or repackages them.
    ```bash
    git tag v0.2.0 && git push origin v0.2.0
    ```
-3. Wait for **build-installers** to finish. It creates a **draft** release with
+3. Wait for the **release** workflow to finish. It creates a **draft** release with
    installers, updater artifacts, `latest.json`, SBOMs and attestations.
 4. Review the draft, then publish it.
 5. Refresh the package-manager manifests:

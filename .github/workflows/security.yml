@@ -27,7 +27,9 @@ jobs:
       - name: Audit Rust dependencies
         uses: rustsec/audit-check@v2.0.0
         with:
-          token: ${{ secrets.TOKEN }}
+          # The Checks API requires a GitHub App installation token; a PAT (secrets.TOKEN)
+          # is rejected. GITHUB_TOKEN is the Actions app token and works with checks: write.
+          token: ${{ secrets.GITHUB_TOKEN }}
           working-directory: src-tauri
 
   npm:

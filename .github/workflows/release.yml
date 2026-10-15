@@ -1,9 +1,14 @@
-name: build-installers
+name: release
 
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing git tag to build and publish (e.g. v0.1.0)
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -21,6 +26,8 @@ jobs:
       attestations: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - name: Linux system packages
         if: matrix.os == 'ubuntu-22.04'
         run: |
@@ -47,8 +54,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Stratum ${{ github.ref_name }}"
+          tagName: ${{ inputs.tag || github.ref_name }}
+          releaseName: "Stratum ${{ inputs.tag || github.ref_name }}"
           releaseDraft: true
           args: --config src-tauri/tauri.release.conf.json
           updaterJsonPreferNsis: true
@@ -78,7 +85,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.TOKEN }}
-        run: gh release upload "${{ github.ref_name }}" "stratum-${{ matrix.os }}.spdx.json" --clobber
+        run: gh release upload "${{ inputs.tag || github.ref_name }}" "stratum-${{ matrix.os }}.spdx.json" --clobber
       - name: Attest build provenance
         uses: actions/attest-build-provenance@v4
         with:

@@ -1,0 +1,90 @@
+# Manually build production installers for every platform and upload them as
+# downloadable Actions artifacts. Use build-installers.yml when you just want the
+# installers (e.g. from a machine without Linux/macOS); use release.yml to also
+# publish them on a GitHub release. Uses only the built-in token.
+name: build-installers
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-installers
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: Windows
+          - os: ubuntu-22.04
+            platform: Linux
+          - os: macos-latest
+            platform: macOS
+    env:
+      # Optional Windows Authenticode signing; scripts/sign-windows.ps1 no-ops when unset.
+      WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+      WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+      WINDOWS_TIMESTAMP_URL: ${{ vars.WINDOWS_TIMESTAMP_URL }}
+      # Required to also emit auto-updater artifacts (.sig); falls back to installers-only.
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Linux system packages
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libgtk-3-dev
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+      - run: npm ci
+      - run: npm run icons
+      - name: Build (with updater artifacts)
+        if: ${{ env.TAURI_SIGNING_PRIVATE_KEY != '' }}
+        run: npx tauri build --config src-tauri/tauri.release.conf.json
+      - name: Build (installers only, no signing key configured)
+        if: ${{ env.TAURI_SIGNING_PRIVATE_KEY == '' }}
+        run: npx tauri build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: stratum-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.rpm
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.dmg
+            src-tauri/target/release/bundle/**/*.app.tar.gz
+            src-tauri/target/release/bundle/**/*.sig
+
+  collect:
+    name: Bundle all artifacts
+    needs: build
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: all
+          merge-multiple: true
+      - uses: actions/upload-artifact@v7
+        with:
+          name: stratum-installers-all
+          if-no-files-found: error
+          path: all/**

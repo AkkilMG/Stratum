@@ -64,7 +64,7 @@ npm run tauri dev      # run in development
 npm run tauri build    # build installers for your OS
 ```
 
-Tauri builds installers for the OS it runs on. See [`docs/BUILDING.md`](docs/BUILDING.md) for platform notes and Linux packages via Docker, and the [build-installers workflow](.github/workflows/release.yml) for CI.
+Tauri builds installers for the OS it runs on. See [`docs/BUILDING.md`](docs/BUILDING.md) for platform notes and Linux packages via Docker. CI can build every platform for you: run the [build-installers workflow](.github/workflows/build-installers.yml) for downloadable installers, or the [release workflow](.github/workflows/release.yml) to publish a tagged release.
 
 ## How it works
 
