@@ -137,6 +137,10 @@ Add captures to docs/images/ and replace this comment with a centred grid, for e
   meaning; without it everything else works and search falls back to keywords.
 - **Rust (stable)** and **Node.js 20.19+** — only needed to build from source.
 
+You do not have to install Git or Ollama yourself. The Windows setup offers to download
+and install Git for you (and optional Ollama), and Stratum can install both on first run
+from the app's own screen. See [Install](#install).
+
 ## Install
 
 Prebuilt installers are published on the
@@ -147,6 +151,12 @@ Prebuilt installers are published on the
 | Windows | `.exe` setup (NSIS) or `.msi` |
 | Linux | `.deb`, `.rpm` or `.AppImage` |
 | macOS | `.dmg` (build from source — see below) |
+
+The Windows setup checks for Git and, with your consent, downloads and installs it (and
+optional Ollama) for you; it also recommends installing to the C: drive for best
+performance. On every platform, if a dependency is still missing the app offers to
+install it on first run, and you can always install Git, Git LFS or Ollama later from
+**Settings**.
 
 Installed builds update themselves from the signed release feed. CI also commits fresh
 builds into [`release/`](release/) whenever the
@@ -225,6 +235,10 @@ on your computer. See the [privacy policy](legal/PRIVACY.md).
 
 **Do I need a NAS?** No. "This PC only" is the simplest setup; a NAS (or any Git server)
 is optional and useful for teams.
+
+**Do I need to install Git myself?** No. Stratum needs Git, but the Windows setup and the
+app's first-run check both offer to download and install it for you. If you prefer, install
+Git from [git-scm.com](https://git-scm.com) beforehand and Stratum will use it.
 
 **Do I need Ollama?** No. It powers automatic tags and search by meaning; without it
 everything else works and search falls back to keywords.

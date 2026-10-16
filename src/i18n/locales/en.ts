@@ -40,6 +40,8 @@ const en = {
   "c.back": "Back", "c.continue": "Continue", "c.cancel": "Cancel", "c.close": "Close", "c.save": "Save", "c.next": "Next", "c.recheck": "Re-check",
   "c.download": "Download", "c.downloading": "Downloading…", "c.copy_details": "Copy details", "c.dismiss": "Dismiss", "c.browse": "Browse", "c.ready": "Ready",
   "c.checking": "Checking…", "c.working": "Working…", "c.opening": "Opening…", "c.required": "Required", "c.optional": "Optional",
+  "c.install": "Install",
+  "dep.prepare": "Preparing…", "dep.download": "Downloading…", "dep.verify": "Verifying…", "dep.install": "Installing…", "dep.done": "Installed. Checking again…",
   "c.copy_fail": "Couldn’t copy to the clipboard.", "c.copied": "Details copied.",
   "sp.presents": "presents", "sp.starting": "Starting…", "sp.opening": "Opening your space…",
   "lang.title": "Choose your language", "lang.sub": "You can change this at any time in Settings.", "lang.pick": "Language",
@@ -80,7 +82,8 @@ const en = {
   "w.fld_nas": "Studio NAS location", "w.fld_nas_d": "Pick a folder on your mounted NAS (like Z:\\ or \\\\nas\\studio), or paste a server address for a remote Git server over WAN or VPN.",
   "w.fld_ph": "Choose a folder or paste an address", "w.adv": "Advanced", "w.lfs": "My server supports Git LFS (Gitea, GitLab, GitHub). Leave off for a NAS folder.", "w.skip_nas": "Skip the NAS for now",
   "w.chk_h": "System check", "w.chk_lead": "Only Git is required. The local AI is optional and powers automatic tags and search by meaning.",
-  "w.chk_git": "Git", "w.chk_git_h": "Install Git from git-scm.com, then press Re-check.", "w.chk_ollama": "Ollama (local AI)", "w.chk_ollama_h": "Install from ollama.com and keep it running.",
+  "w.chk_git": "Git", "w.chk_git_h": "Stratum needs Git to save versions. Press Install and we’ll set it up for you.",
+  "w.chk_ollama": "Ollama (local AI)", "w.chk_ollama_h": "Optional. On-device AI for automatic tags and search by meaning. Press Install to get it.",
   "w.chk_vision": "Vision model (llava:7b)", "w.chk_vision_h": "Reads your images to suggest tags.", "w.chk_embed": "Search model (nomic-embed-text)", "w.chk_embed_h": "Lets you search by meaning.",
   "w.chk_lfs": "Git LFS", "w.chk_lfs_h": "Only used if your server supports it.",
   "w.create_h": "Ready to create your space", "w.sum_name": "Name", "w.sum_setup": "Setup", "w.sum_local": "Local folder", "w.sum_nas": "NAS",
@@ -146,6 +149,7 @@ const en = {
   "e.network_dns": "Couldn’t reach the server. Check the address and your network connection.", "e.network_conn": "The connection was refused or dropped. Check that the server is running.", "e.permission": "Permission denied. Check the permissions of the file or folder.",
   "e.not_found": "The file or folder couldn’t be found.", "e.oom": "There wasn’t enough memory to finish this operation.", "e.merge_conflict": "A merge conflict couldn’t be resolved automatically. Your local files were kept.",
   "e.merge_abort": "The merge was stopped. Your local files were kept.", "e.op_failed": "The operation couldn’t be completed.", "e.unknown": "Something unexpected happened.",
+  "e.install_failed": "Couldn’t install. Check your internet connection and that you allowed the installation, then try again.",
   "m.synced": "Synced with the studio NAS", "m.conflicts": "Synced. Files also edited by a teammate: {n}. Their version was saved next to yours as “(conflict from teammate)”.",
 };
 export default en;

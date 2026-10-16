@@ -1,4 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+mod deps;
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use notify::{RecursiveMode, Watcher};
 use rusqlite::{params, Connection};
@@ -92,7 +93,7 @@ fn export_tags(root: &Path) {
 }
 /// git with a hard timeout, no credential prompts: a dead NAS or VPN can never hang the app.
 fn git_t(root: &Path, args: &[&str], secs: u64) -> (bool, String) {
-    let mut c = Command::new("git");
+    let mut c = Command::new(deps::git_bin());
     c.current_dir(root).args(["-c", "safe.directory=*"]).args(args)
         .env("GIT_TERMINAL_PROMPT", "0").env("GIT_SSH_COMMAND", "ssh -o BatchMode=yes -o ConnectTimeout=10")
         .stdout(Stdio::piped()).stderr(Stdio::piped());
@@ -135,7 +136,7 @@ struct Commit { hash: String, author: String, when: String, msg: String }
 
 // ---------- helpers ----------
 fn git(root: &Path, args: &[&str]) -> Vec<u8> {
-    let mut c = Command::new("git");
+    let mut c = Command::new(deps::git_bin());
     c.current_dir(root).args(["-c", "safe.directory=*"]).args(args).env("GIT_TERMINAL_PROMPT", "0");
     #[cfg(windows)]
     c.creation_flags(0x08000000);
@@ -446,7 +447,7 @@ fn ignored(n: &str) -> bool {
     n.ends_with('~') || n.ends_with(".tmp") || n.ends_with(".swp") || n.ends_with(".lock") || n.starts_with("~$") || n.starts_with(".~") || n == "Thumbs.db" || n == ".DS_Store" || n == ".stratum-tags.json"
 }
 fn git_out(root: &Path, args: &[&str]) -> (bool, String) {
-    let mut c = Command::new("git");
+    let mut c = Command::new(deps::git_bin());
     c.current_dir(root).args(["-c", "safe.directory=*"]).args(args).env("GIT_TERMINAL_PROMPT", "0");
     #[cfg(windows)]
     c.creation_flags(0x08000000);
@@ -602,13 +603,12 @@ async fn sync(app: AppHandle, st: State<'_, Vault>) -> R<String> {
     res
 }
 #[derive(Serialize)]
-struct Check { git: bool, lfs: bool, ollama: bool, vision: bool, embed: bool }
+struct Check { git: bool, lfs: bool, ollama: bool, vision: bool, embed: bool, os: Option<String> }
 #[tauri::command]
 async fn system_check() -> R<Check> {
-    let t = |a: &[&str]| { let mut c = Command::new("git"); c.args(a); #[cfg(windows)] c.creation_flags(0x08000000); c.output().map(|o| o.status.success()).unwrap_or(false) };
     let v: Option<Value> = http(Duration::from_millis(1500)).get(&format!("{OLLAMA}/api/tags")).call().ok().and_then(|mut r| r.body_mut().read_json::<Value>().ok());
     let names: String = v.as_ref().and_then(|v| v["models"].as_array()).map(|a| a.iter().filter_map(|m| m["name"].as_str()).collect::<Vec<_>>().join(" ")).unwrap_or_default();
-    Ok(Check { git: t(&["--version"]), lfs: t(&["lfs", "version"]), ollama: v.is_some(), vision: names.contains("llava"), embed: names.contains("nomic-embed-text") })
+    Ok(Check { git: deps::git_ok(&["--version"]), lfs: deps::git_ok(&["lfs", "version"]), ollama: v.is_some(), vision: names.contains("llava"), embed: names.contains("nomic-embed-text"), os: Some(std::env::consts::OS.to_string()) })
 }
 #[tauri::command]
 async fn pull_model(name: String) -> R<()> {
@@ -689,7 +689,7 @@ fn main() {
             Ok(())
         })
         .manage(Vault::default())
-        .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync, system_check, pull_model, set_author, create_hub, join_hub, record_acceptance, quit])
+        .invoke_handler(tauri::generate_handler![open_vault, stats, list_assets, search, thumb, history, version_preview, restore, set_tags, import_files, activity, get_remote, set_remote, sync, system_check, pull_model, set_author, create_hub, join_hub, record_acceptance, quit, deps::install_dep, deps::deps_status])
         .run(tauri::generate_context!())
         .expect("failed to run Stratum");
 }

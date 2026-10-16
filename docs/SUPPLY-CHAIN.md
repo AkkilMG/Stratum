@@ -59,6 +59,24 @@ gh attestation verify ./Stratum_0.1.0_x64-setup.exe \
 A successful verification means the binary was produced by the tagged commit in
 this repository, not merely uploaded by someone with access to the release page.
 
+## Optional dependency installation
+
+Stratum needs Git, and can optionally use Git LFS and Ollama. These are never
+bundled; instead the app (and the Windows `NSIS` setup, with consent) can download
+and install them on the user's machine. The same rules apply in both places:
+
+- the user is always asked first — nothing installs silently, and unattended
+  (`/S`) installs skip it entirely,
+- the download URL is resolved from the project's official release endpoint — the
+  GitHub Releases API for [Git for Windows](https://github.com/git-for-windows/git)
+  and [Git LFS](https://github.com/git-lfs/git-lfs), and `ollama.com` for Ollama,
+- on Windows the downloaded installer's **Authenticode** signature must be valid
+  before it is executed; installers that need elevation prompt for it themselves.
+
+This mirrors the trust model for Stratum's own artifacts: fetch from the official
+source, verify provenance where the platform provides it, and ask before doing
+anything to the user's system.
+
 ## Dependency and vulnerability scanning
 
 | Workflow | Tool | Scope |

@@ -41,6 +41,7 @@ const fr: Dict = {
   "c.back": "Retour", "c.continue": "Continuer", "c.cancel": "Annuler", "c.close": "Fermer", "c.save": "Enregistrer", "c.next": "Suivant", "c.recheck": "Vérifier à nouveau",
   "c.download": "Télécharger", "c.downloading": "Téléchargement…", "c.copy_details": "Copier les détails", "c.dismiss": "Ignorer", "c.browse": "Parcourir", "c.ready": "Prêt",
   "c.checking": "Vérification…", "c.working": "Traitement en cours…", "c.opening": "Ouverture…", "c.required": "Obligatoire", "c.optional": "Facultatif",
+  "c.install": "Installer", "dep.prepare": "Préparation…", "dep.download": "Téléchargement…", "dep.verify": "Vérification…", "dep.install": "Installation…", "dep.done": "Installé. Nouvelle vérification…",
   "c.copy_fail": "Impossible de copier dans le presse-papiers.", "c.copied": "Détails copiés.",
   "sp.presents": "présente", "sp.starting": "Démarrage…", "sp.opening": "Ouverture de votre espace…",
   "lang.title": "Choisissez votre langue", "lang.sub": "Vous pouvez la modifier à tout moment dans les Paramètres.", "lang.pick": "Langue",
@@ -147,6 +148,7 @@ const fr: Dict = {
   "e.network_dns": "Impossible d’atteindre le serveur. Vérifiez l’adresse et votre connexion réseau.", "e.network_conn": "La connexion a été refusée ou interrompue. Vérifiez que le serveur est en cours d’exécution.", "e.permission": "Permission refusée. Vérifiez les autorisations du fichier ou du dossier.",
   "e.not_found": "Le fichier ou le dossier est introuvable.", "e.oom": "Mémoire insuffisante pour terminer cette opération.", "e.merge_conflict": "Un conflit de fusion n’a pas pu être résolu automatiquement. Vos fichiers locaux ont été conservés.",
   "e.merge_abort": "La fusion a été interrompue. Vos fichiers locaux ont été conservés.", "e.op_failed": "L’opération n’a pas pu être effectuée.", "e.unknown": "Un événement inattendu s’est produit.",
+  "e.install_failed": "Échec de l’installation. Vérifiez votre connexion internet et que vous avez autorisé l’installation, puis réessayez.",
   "m.synced": "Synchronisé avec le NAS du studio", "m.conflicts": "Synchronisé. Fichiers également modifiés par un collègue : {n}. Sa version a été enregistrée à côté de la vôtre sous la mention « (conflit d’un collègue) ».",
 };
 export default fr;

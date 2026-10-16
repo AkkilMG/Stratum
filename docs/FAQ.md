@@ -24,9 +24,18 @@ No. Stratum has no accounts, no telemetry and no cloud. Your files stay on your 
 
 No. "This PC only" is the simplest setup. A NAS (or any Git server) is optional and useful for teams.
 
+## Do I need to install Git myself?
+
+No. Stratum needs Git, but you do not have to go looking for it. The Windows setup offers
+to download and install Git for you, and if it is still missing when you first open the app,
+Stratum offers to install it then. You can also install Git (and optional Git LFS) at any
+time from **Settings**. If you already have Git installed, Stratum uses it. On macOS and
+Linux the app installs Git through your package manager (for example `brew`, `apt` or `dnf`)
+with your permission.
+
 ## Do I need to install Ollama?
 
-No. Ollama powers automatic image tags and semantic search. Without it, everything else works and search falls back to keywords.
+No. Ollama powers automatic image tags and semantic search. Without it, everything else works and search falls back to keywords. You can install it later from the Windows setup or from **Settings** whenever you want on-device AI.
 
 ## Is my version history a backup?
 

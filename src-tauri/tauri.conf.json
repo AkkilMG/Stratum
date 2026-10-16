@@ -60,7 +60,8 @@
       "nsis": {
         "headerImage": "installer/nsis-header.bmp",
         "sidebarImage": "installer/nsis-sidebar.bmp",
-        "installerIcon": "icons/icon.ico"
+        "installerIcon": "icons/icon.ico",
+        "installerHooks": "installer/windows-deps.nsh"
       },
       "wix": {
         "bannerPath": "installer/wix-banner.bmp",

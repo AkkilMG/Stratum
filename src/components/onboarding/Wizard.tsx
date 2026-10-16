@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type * as React from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { call } from "../../services/api";
-import { Credits, LangPicker } from "../common";
+import { Credits, DepChecks, LangPicker } from "../common";
 import { errText, useI18n, type Key } from "../../i18n";
 import mark from "../../assets/stratum-mark.png";
 import type { Cfg, Check } from "../../types";
@@ -21,7 +21,6 @@ export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { st
   const [i, setI] = useState(start);
   const [c, setC] = useState<Cfg>({ name: localStorage.getItem("author") ?? "", mode: mode ?? "hub", local: "", nas: "", lfs: false });
   const [chk, setChk] = useState<Check | null>(null);
-  const [pull, setPull] = useState("");
   const [log, setLog] = useState<string[]>([]);
   const [err, setErr] = useState("");
   const [working, setWorking] = useState(false);
@@ -49,12 +48,6 @@ export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { st
       await onDone(c, remote, tour);
     } catch (e) { setErr(errText(e)); setWorking(false); }
   }
-  const dl = async (m: string) => { setPull(m); try { await call("pull_model", { name: m }); } catch (e) { setErr(errText(e)); } setPull(""); recheck(); };
-
-  const row = (label: Key, ok: boolean | undefined, req: boolean, help: Key, act?: React.JSX.Element) => (
-    <div className="crow" key={label}><i className={"dot " + (ok ? "ok" : req ? "bad" : "warn")} /><div><b>{t(label)}</b> <em>{req ? t("c.required") : t("c.optional")}</em><small>{ok ? t("c.ready") : t(help)}</small></div>{!ok && act}</div>
-  );
-  const dlBtn = (m: string) => <button className="ghostb" disabled={!chk?.ollama || !!pull} onClick={() => dl(m)}>{pull === m ? t("c.downloading") : t("c.download")}</button>;
   const modes: [Cfg["mode"], React.JSX.Element, Key, Key, Key | ""][] = [["local", I.pc, "w.m_local", "w.m_local_d", ""], ["hub", I.nas, "w.m_hub", "w.m_hub_d", "w.m_hub_tag"], ["join", I.team, "w.m_join", "w.m_join_d", ""]];
 
   return (
@@ -88,12 +81,7 @@ export default function Wizard({ start = 0, mode, onTour, onSkip, onDone }: { st
         </>}
         {i === 4 && <>
           <h2>{t("w.chk_h")}</h2><p className="lead sm">{t("w.chk_lead")}</p>
-          <div className="checks">{!chk ? <p className="hint">{t("c.checking")}</p> : <>
-            {row("w.chk_git", chk.git, true, "w.chk_git_h")}
-            {row("w.chk_ollama", chk.ollama, false, "w.chk_ollama_h")}
-            {row("w.chk_vision", chk.vision, false, "w.chk_vision_h", dlBtn("llava:7b"))}
-            {row("w.chk_embed", chk.embed, false, "w.chk_embed_h", dlBtn("nomic-embed-text"))}
-            {row("w.chk_lfs", chk.lfs, false, "w.chk_lfs_h")}</>}</div>
+          <DepChecks chk={chk} recheck={recheck} onNote={setErr} />
           <button className="link" onClick={recheck}>{t("c.recheck")}</button>
         </>}
         {i === 5 && <>

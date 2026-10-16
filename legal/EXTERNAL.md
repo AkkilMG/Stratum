@@ -2,6 +2,8 @@
 
 These tools are not bundled with Stratum. Stratum runs them on your computer if they are installed, and they remain under their own licenses.
 
+Stratum can also download and install some of them for you, always with your consent and never silently: the Windows setup offers to install Git (and optional Ollama) during installation, and the app offers to install Git, Git LFS or Ollama from its first-run check or from **Settings**. Downloads come from each project's official source (the Git for Windows, Git LFS and Ollama release pages), and each installer is checked for a valid code-signing signature where the platform provides one before it is run. Unattended/silent installs skip this and leave it to the app.
+
 - Git (GPL-2.0-only): Stratum starts the git program as a separate process. It is not linked into or distributed with Stratum.
 - Git LFS (MIT): optional, only used if you enable it for a server that supports it.
 - Ollama (MIT): optional local AI runtime that you install yourself.

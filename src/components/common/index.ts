@@ -6,5 +6,6 @@ export { ExtLink } from './ExtLink';
 export { Modal } from './Modal';
 export { Check, Chev, Copy, Cpu, Drive, Globe, Grid, Info, LifeBuoy, Mail, Palette, Refresh, Rows, Search, Tag, User, X } from './icons';
 export { Combobox, type Opt } from './Combobox';
+export { DepChecks } from './DepChecks';
 export { LangPicker } from './LangPicker';
 export * from './ui-legacy';

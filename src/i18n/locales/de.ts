@@ -41,6 +41,7 @@ const de: Dict = {
   "c.back": "Zurück", "c.continue": "Weiter", "c.cancel": "Abbrechen", "c.close": "Schließen", "c.save": "Speichern", "c.next": "Weiter", "c.recheck": "Erneut prüfen",
   "c.download": "Herunterladen", "c.downloading": "Wird heruntergeladen …", "c.copy_details": "Details kopieren", "c.dismiss": "Ausblenden", "c.browse": "Durchsuchen", "c.ready": "Bereit",
   "c.checking": "Wird geprüft …", "c.working": "Wird verarbeitet …", "c.opening": "Wird geöffnet …", "c.required": "Erforderlich", "c.optional": "Optional",
+  "c.install": "Installieren", "dep.prepare": "Vorbereitung …", "dep.download": "Wird heruntergeladen …", "dep.verify": "Wird überprüft …", "dep.install": "Wird installiert …", "dep.done": "Installiert. Erneute Prüfung …",
   "c.copy_fail": "Das Kopieren in die Zwischenablage ist fehlgeschlagen.", "c.copied": "Details kopiert.",
   "sp.presents": "präsentiert", "sp.starting": "Wird gestartet …", "sp.opening": "Ihr Arbeitsbereich wird geöffnet …",
   "lang.title": "Wählen Sie Ihre Sprache", "lang.sub": "Sie können die Sprache jederzeit in den Einstellungen ändern.", "lang.pick": "Sprache",
@@ -147,6 +148,7 @@ const de: Dict = {
   "e.network_dns": "Der Server ist nicht erreichbar. Prüfen Sie die Adresse und Ihre Netzwerkverbindung.", "e.network_conn": "Die Verbindung wurde abgelehnt oder unterbrochen. Prüfen Sie, ob der Server läuft.", "e.permission": "Zugriff verweigert. Prüfen Sie die Berechtigungen der Datei oder des Ordners.",
   "e.not_found": "Die Datei oder der Ordner wurde nicht gefunden.", "e.oom": "Es war nicht genügend Arbeitsspeicher vorhanden, um diesen Vorgang abzuschließen.", "e.merge_conflict": "Ein Zusammenführungskonflikt konnte nicht automatisch behoben werden. Ihre lokalen Dateien wurden beibehalten.",
   "e.merge_abort": "Die Zusammenführung wurde abgebrochen. Ihre lokalen Dateien wurden beibehalten.", "e.op_failed": "Der Vorgang konnte nicht abgeschlossen werden.", "e.unknown": "Es ist etwas Unerwartetes passiert.",
+  "e.install_failed": "Installation fehlgeschlagen. Prüfen Sie Ihre Internetverbindung und ob Sie die Installation zugelassen haben, und versuchen Sie es erneut.",
   "m.synced": "Mit dem Studio-NAS synchronisiert", "m.conflicts": "Synchronisiert. Auch von einem Teammitglied bearbeitete Dateien: {n}. Dessen Version wurde neben Ihrer als „(Konflikt von Teammitglied)“ gespeichert.",
 };
 export default de;

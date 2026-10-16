@@ -4,8 +4,8 @@ import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { call } from "../../services/api";
 import { APP, getAcceptance } from "../../config/legal";
-import { ArkLogo, Copy, Cpu, Drive, ExtLink, Globe, Info, LangPicker, LifeBuoy, Mail, Modal, Palette, Refresh, User } from "../common";
-import { dateOf, errText, fmtBytes, num, useI18n, type Key } from "../../i18n";
+import { ArkLogo, Copy, Cpu, DepChecks, Drive, ExtLink, Globe, Info, LangPicker, LifeBuoy, Mail, Modal, Palette, Refresh, User } from "../common";
+import { dateOf, fmtBytes, num, useI18n, type Key } from "../../i18n";
 import mark from "../../assets/stratum-tile.png";
 import type { Check, Stats } from "../../types";
 
@@ -107,16 +107,10 @@ export function Settings(p: P) {
   const { t } = useI18n();
   const [name, setName] = useState(p.name);
   const [chk, setChk] = useState<Check | null>(null);
-  const [pull, setPull] = useState("");
   const acc = getAcceptance();
   const recheck = () => call<Check>("system_check").then(setChk).catch(() => {});
   useEffect(() => { recheck(); }, []);
   useEffect(() => { setName(p.name); }, [p.name]);
-  const dl = async (m: string) => { setPull(m); try { await call("pull_model", { name: m }); p.note(t("s.model_ready", { m })); } catch (e) { p.note(errText(e)); } setPull(""); recheck(); };
-  const row = (label: Key, ok: boolean | undefined, req: boolean, help: Key, act?: ReactNode) => (
-    <div className="crow" key={label}><i className={"dot " + (ok ? "ok" : req ? "bad" : "warn")} /><div><b>{t(label)}</b> <em>{req ? t("c.required") : t("c.optional")}</em><small>{ok ? t("c.ready") : t(help)}</small></div>{!ok && act}</div>
-  );
-  const dlBtn = (m: string) => <button className="ghostb" disabled={!chk?.ollama || !!pull} onClick={() => dl(m)}>{pull === m ? t("c.downloading") : t("c.download")}</button>;
   const THEMES: [string, Key][] = [["system", "th.system"], ["light", "th.light"], ["dark", "th.dark"]];
   const s = p.stats;
   const trimmed = name.trim();
@@ -163,13 +157,7 @@ export function Settings(p: P) {
 
       <Band title={t("s.ai")} icon={<Cpu />} action={<button className="ghostb" onClick={recheck}><Refresh s={13} />{t("c.recheck")}</button>}>
         <Panel hint={t("s.ai_d")}>
-          {!chk ? <p className="hint">{t("c.checking")}</p> : <div className="checks">
-            {row("w.chk_git", chk.git, true, "w.chk_git_h")}
-            {row("w.chk_ollama", chk.ollama, false, "w.chk_ollama_h")}
-            {row("w.chk_vision", chk.vision, false, "w.chk_vision_h", dlBtn("llava:7b"))}
-            {row("w.chk_embed", chk.embed, false, "w.chk_embed_h", dlBtn("nomic-embed-text"))}
-            {row("w.chk_lfs", chk.lfs, false, "w.chk_lfs_h")}
-          </div>}
+          <DepChecks chk={chk} recheck={recheck} onNote={p.note} />
         </Panel>
       </Band>
 

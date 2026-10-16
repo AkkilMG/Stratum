@@ -41,6 +41,7 @@ const es: Dict = {
   "c.back": "Atrás", "c.continue": "Continuar", "c.cancel": "Cancelar", "c.close": "Cerrar", "c.save": "Guardar", "c.next": "Siguiente", "c.recheck": "Volver a comprobar",
   "c.download": "Descargar", "c.downloading": "Descargando…", "c.copy_details": "Copiar detalles", "c.dismiss": "Descartar", "c.browse": "Examinar", "c.ready": "Listo",
   "c.checking": "Comprobando…", "c.working": "Trabajando…", "c.opening": "Abriendo…", "c.required": "Obligatorio", "c.optional": "Opcional",
+  "c.install": "Instalar", "dep.prepare": "Preparando…", "dep.download": "Descargando…", "dep.verify": "Verificando…", "dep.install": "Instalando…", "dep.done": "Instalado. Comprobando de nuevo…",
   "c.copy_fail": "No se pudo copiar al portapapeles.", "c.copied": "Detalles copiados.",
   "sp.presents": "presenta", "sp.starting": "Iniciando…", "sp.opening": "Abriendo su espacio…",
   "lang.title": "Elija su idioma", "lang.sub": "Puede cambiarlo en cualquier momento en Configuración.", "lang.pick": "Idioma",
@@ -147,6 +148,7 @@ const es: Dict = {
   "e.network_dns": "No se pudo acceder al servidor. Compruebe la dirección y su conexión de red.", "e.network_conn": "Se rechazó o se interrumpió la conexión. Compruebe que el servidor esté en ejecución.", "e.permission": "Permiso denegado. Compruebe los permisos del archivo o la carpeta.",
   "e.not_found": "No se pudo encontrar el archivo o la carpeta.", "e.oom": "No hubo memoria suficiente para completar esta operación.", "e.merge_conflict": "No se pudo resolver automáticamente un conflicto de fusión. Se conservaron sus archivos locales.",
   "e.merge_abort": "La fusión se detuvo. Se conservaron sus archivos locales.", "e.op_failed": "No se pudo completar la operación.", "e.unknown": "Ocurrió algo inesperado.",
+  "e.install_failed": "No se pudo instalar. Compruebe su conexión a internet y que permitió la instalación, y vuelva a intentarlo.",
   "m.synced": "Sincronizado con el NAS del estudio", "m.conflicts": "Sincronizado. Archivos que también editó un compañero: {n}. Su versión se guardó junto a la suya como «(conflicto de un compañero)».",
 };
 export default es;
