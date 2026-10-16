@@ -47,7 +47,6 @@ export interface Messages {
   footer: {
     prev: string;
     next: string;
-    edit: string;
     rights: string;
     madeBy: string;
     docsHome: string;
@@ -60,8 +59,12 @@ export interface Messages {
     captureHint: string;
     copy: string;
     copied: string;
+    learnMore: string;
     version: string;
     basedOn: string;
+    home: string;
+    backToTop: string;
+    contents: string;
   };
   home: {
     eyebrow: string;

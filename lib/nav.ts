@@ -50,8 +50,8 @@ export const nav = [
   },
   {
     id: "building",
-    label: "Building & Contributing",
-    items: [{ slug: "building/overview", title: "Building from source" }],
+    label: "For Developers",
+    items: [{ slug: "building/overview", title: "Build & contribute" }],
   },
   {
     id: "changelog",
@@ -59,3 +59,29 @@ export const nav = [
     items: [{ slug: "changelog/overview", title: "Changelog" }],
   },
 ];
+
+export interface NavItem {
+  slug: string;
+  title: string;
+}
+
+export function flattenNav(): NavItem[] {
+  const out: NavItem[] = [];
+  for (const s of nav) {
+    for (const i of s.items) out.push(i);
+  }
+  return out;
+}
+
+export function getPrevNext(slug?: string | null): { prev: NavItem | null; next: NavItem | null } {
+  const flat = flattenNav();
+  const idx = flat.findIndex((f) => f.slug === (slug ?? ""));
+  return {
+    prev: idx > 0 ? flat[idx - 1] : null,
+    next: idx >= 0 && idx < flat.length - 1 ? flat[idx + 1] : null,
+  };
+}
+
+export function sectionLabel(sectionId: string): string {
+  return nav.find((s) => s.id === sectionId)?.label ?? sectionId;
+}

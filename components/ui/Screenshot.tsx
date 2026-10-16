@@ -6,6 +6,8 @@ import { Camera, ImageOff } from "@/components/ui/icons";
 import { useI18n } from "@/lib/i18n/context";
 import { withBasePath } from "@/lib/util";
 
+type Stage = "png" | "svg" | "failed";
+
 export function Screenshot({
   name,
   caption,
@@ -18,8 +20,12 @@ export function Screenshot({
   ratio?: string;
 }) {
   const { messages } = useI18n();
-  const [failed, setFailed] = useState(false);
-  const src = withBasePath(`/screenshots/${name}.png`);
+  const [stage, setStage] = useState<Stage>("png");
+  const src = withBasePath(`/screenshots/${name}.${stage === "png" ? "png" : "svg"}`);
+
+  function onError() {
+    setStage((s) => (s === "png" ? "svg" : "failed"));
+  }
 
   return (
     <figure className="my-6">
@@ -27,7 +33,6 @@ export function Screenshot({
         className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-lg shadow-[0_10px_40px_-24px_rgba(0,0,0,0.6)]"
         style={{ aspectRatio: ratio }}
       >
-        {/* window chrome */}
         <div className="flex items-center gap-2 border-b border-border bg-muted px-3 py-2">
           <span className="flex gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
@@ -43,13 +48,13 @@ export function Screenshot({
         </div>
 
         <div className="relative" style={{ height: "calc(100% - 34px)" }}>
-          {!failed ? (
+          {stage !== "failed" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={src}
               alt={alt ?? caption ?? name}
               className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
-              onError={() => setFailed(true)}
+              onError={onError}
               loading="lazy"
             />
           ) : (
@@ -82,9 +87,7 @@ export function Screenshot({
       </div>
 
       {caption && (
-        <figcaption className="mt-2.5 text-center text-sm text-muted-foreground">
-          {caption}
-        </figcaption>
+        <figcaption className="mt-2.5 text-center text-sm text-muted-foreground">{caption}</figcaption>
       )}
     </figure>
   );

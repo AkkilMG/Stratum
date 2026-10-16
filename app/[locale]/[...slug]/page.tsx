@@ -4,13 +4,16 @@ import { getMessages } from "@/lib/i18n/messages";
 import { I18nProvider } from "@/lib/i18n/context";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Toc } from "@/components/layout/Toc";
+import { Toc, MobileToc } from "@/components/layout/Toc";
 import { Footer } from "@/components/layout/Footer";
 import { ProgressBar } from "@/components/layout/ProgressBar";
 import { SearchModal } from "@/components/layout/SearchModal";
+import { BackToTop } from "@/components/layout/BackToTop";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { NotTranslated } from "@/components/layout/NotTranslated";
 import { getDocPage, getAllSlugs } from "@/lib/content/registry";
 import { isContentTranslated } from "@/lib/content/translated";
+import { getPrevNext } from "@/lib/nav";
 
 export function generateStaticParams() {
   const all: { locale: string; slug: string[] }[] = [];
@@ -40,24 +43,33 @@ export default async function Page({
   const Body = page.Body;
   const messages = getMessages(locale);
   const translated = isContentTranslated(locale, path);
+  const sectionLabel = messages.sidebar.sections[meta.sectionId] ?? messages.brand.name;
+  const { prev } = getPrevNext(meta.slug);
 
   return (
     <I18nProvider locale={locale}>
       <div className="relative min-h-screen bg-background text-foreground">
         <ProgressBar />
         <SearchModal />
-        <Header locale={locale} messages={messages} />
-        <div className="mx-auto flex max-w-7xl gap-8 px-4 sm:px-6 lg:px-8">
-          <Sidebar locale={locale} messages={messages} />
+        <BackToTop />
+        <Header />
+        <div className="mx-auto flex max-w-[90rem] gap-8 px-4 sm:px-6 lg:px-8">
+          <Sidebar />
           <main className="min-w-0 flex-1 pb-20 pt-6 md:pt-10">
             {locale !== defaultLocale && !translated && (
               <NotTranslated locale={locale} path={path} messages={messages} />
             )}
+            <MobileToc meta={meta} />
             <article className="mx-auto max-w-3xl">
-              <header className="mb-8">
-                <p className="text-sm font-medium text-primary">
-                  {messages.sidebar.sections[meta.sectionId] ?? messages.brand.name}
-                </p>
+              <Breadcrumbs
+                locale={locale}
+                home={messages.common.home}
+                section={sectionLabel}
+                sectionHref={prev ? `/${locale}/${prev.slug}` : undefined}
+                title={meta.title}
+              />
+              <header className="mb-8 border-b border-border pb-6">
+                <p className="section-label">{sectionLabel}</p>
                 <h1 className="mt-2 text-[2rem] font-semibold tracking-tight sm:text-[2.4rem]">
                   {meta.title}
                 </h1>
@@ -70,7 +82,7 @@ export default async function Page({
               </div>
             </article>
           </main>
-          <Toc locale={locale} messages={messages} meta={meta} />
+          <Toc meta={meta} />
         </div>
         <Footer locale={locale} messages={messages} meta={meta} />
       </div>

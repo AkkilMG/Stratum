@@ -255,6 +255,70 @@ body {
   margin: 2rem 0;
 }
 
+/* Tables — Read-the-Docs flavour */
+.doc-content .table-wrap {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.doc-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.doc-content thead th {
+  background: var(--muted);
+  text-align: left;
+  font-weight: 600;
+  color: var(--foreground);
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.doc-content tbody td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  vertical-align: top;
+}
+.doc-content tbody tr:last-child td {
+  border-bottom: 0;
+}
+.doc-content tbody tr:hover td {
+  background: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+.doc-content td code,
+.doc-content th code {
+  white-space: nowrap;
+}
+
+/* Read-the-Docs style section label */
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* Sidebar / TOC scroll fade */
+.scroll-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 14px),
+    transparent 100%
+  );
+}
+
 .grid-fade {
   background-image: linear-gradient(
       to right,

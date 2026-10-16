@@ -1,11 +1,18 @@
 # Publishes the built static site to the `gh-pages` branch so GitHub Pages can
-# serve it via "Deploy from a branch". Run with: npm run publish
+# serve it via "Deploy from a branch", then pushes the current (wiki) branch.
+# Run with: npm run publish
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
 $out = Join-Path $root "out"
 $branch = "gh-pages"
 $wt = Join-Path $env:TEMP "stratum-ghpages"
+
+$srcBranch = git -C $root rev-parse --abbrev-ref HEAD
+if ($LASTEXITCODE -ne 0 -or -not $srcBranch -or $srcBranch -eq "HEAD") {
+  throw "Unable to determine current branch (detached HEAD?)"
+}
+if ($srcBranch -ne "wiki") { throw "Checked out '$srcBranch'; run this from the 'wiki' branch" }
 
 Write-Host "==> Building static site"
 Push-Location $root
@@ -23,7 +30,7 @@ if (-not (Test-Path (Join-Path $out "index.html"))) {
 
 # Remove any stale worktree from a previous run
 if (Test-Path $wt) {
-  git worktree remove --force $wt | Out-Null
+  git -C $root worktree remove --force $wt | Out-Null
   if (Test-Path $wt) { Remove-Item -Recurse -Force $wt }
 }
 
@@ -58,7 +65,25 @@ if ($LASTEXITCODE -ne 0) {
 }
 else {
   git -C $wt push origin $branch
+  if ($LASTEXITCODE -ne 0) { throw "git push origin $branch failed" }
 }
 
-git worktree remove --force $wt
-Write-Host "==> Published $out to '$branch'"
+git -C $root worktree remove --force $wt
+
+# Commit any pending changes on the source branch so they get pushed too
+Write-Host "==> Committing pending changes on '$srcBranch'"
+git -C $root add -A
+$status = git -C $root status --porcelain
+if ($status) {
+  git -C $root commit -m "chore(wiki): publish snapshot @ $sha"
+  if ($LASTEXITCODE -ne 0) { throw "git commit on $srcBranch failed" }
+}
+else {
+  Write-Host "==> Nothing to commit on '$srcBranch'"
+}
+
+Write-Host "==> Pushing source branch '$srcBranch'"
+git -C $root push origin $srcBranch
+if ($LASTEXITCODE -ne 0) { throw "git push origin $srcBranch failed" }
+
+Write-Host "==> Published $out to '$branch' and pushed '$srcBranch'"
