@@ -19,6 +19,8 @@ const GITHUB_API: &str = "https://api.github.com/repos";
 const GIT_FOR_WINDOWS_REPO: &str = "git-for-windows/git";
 const GIT_LFS_REPO: &str = "git-lfs/git-lfs";
 const OLLAMA_WINDOWS_URL: &str = "https://ollama.com/download/OllamaSetup.exe";
+const OLLAMA_INSTALL_SH: &str = "https://ollama.com/install.sh";
+const OLLAMA_MAC_URL: &str = "https://ollama.com/download/mac";
 
 
 static GIT_BIN: Mutex<Option<OsString>> = Mutex::new(None);
@@ -314,9 +316,8 @@ fn install_git(app: &AppHandle) -> R<()> {
                     cc
                 };
                 emit_progress(app, "git", "install", 100);
-                let r = run_cmd(&mut c);
+                let _ = run_cmd(&mut c);
         clear_git_cache();
-        r
             }
         }
         Err("E:install_failed".into())
@@ -386,7 +387,7 @@ fn install_lfs(app: &AppHandle) -> R<()> {
                     cc
                 };
                 emit_progress(app, "lfs", "install", 100);
-        run_cmd(&mut c)
+        let _ = run_cmd(&mut c);
             }
         }
         Err("E:install_failed".into())
