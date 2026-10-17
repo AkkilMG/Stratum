@@ -2,11 +2,24 @@
 # Actions artifacts, and (by default) commits them into the release/ folder so a
 # simple `git pull` brings them to any machine - handy without Linux/macOS locally.
 #
-# Run it from the Actions tab: Actions -> build-installers -> Run workflow.
+# Runs automatically on pushes to main and can also be triggered manually from
+# the Actions tab: Actions -> build-installers -> Run workflow.
 # Uses only the built-in token.
 name: build-installers
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'src-tauri/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'index.html'
+      - 'tauri*'
+      - '.github/workflows/build-installers.yml'
   workflow_dispatch:
     inputs:
       commit:
@@ -104,7 +117,7 @@ jobs:
   commit:
     name: Commit installers to release/
     needs: [build, collect]
-    if: ${{ !cancelled() && inputs.commit }}
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.commit) }}
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -141,6 +154,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git add -Af release
           if git diff --cached --quiet; then
             echo "No installer changes to commit."
