@@ -154,11 +154,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
           git add -Af release
           if git diff --cached --quiet; then
             echo "No installer changes to commit."
             exit 0
           fi
           git commit -m "chore(release): add built installers [skip ci]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
           git push
