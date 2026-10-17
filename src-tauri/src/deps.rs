@@ -1,5 +1,7 @@
 use serde::Serialize;
 use serde_json::Value;
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 use std::{
     ffi::OsString,
     fs::{self, File},
@@ -10,8 +12,6 @@ use std::{
     time::Duration,
 };
 use tauri::{AppHandle, Emitter};
-#[cfg(windows)]
-use std::os::windows::process::CommandExt;
 
 type R<T> = Result<T, String>;
 
@@ -21,7 +21,6 @@ const GIT_LFS_REPO: &str = "git-lfs/git-lfs";
 const OLLAMA_WINDOWS_URL: &str = "https://ollama.com/download/OllamaSetup.exe";
 const OLLAMA_INSTALL_SH: &str = "https://ollama.com/install.sh";
 const OLLAMA_MAC_URL: &str = "https://ollama.com/download/mac";
-
 
 static GIT_BIN: Mutex<Option<OsString>> = Mutex::new(None);
 
@@ -139,10 +138,7 @@ fn github_asset(repo: &str, want: impl Fn(&str) -> bool) -> R<String> {
         .header("User-Agent", "Stratum")
         .call()
         .map_err(|_| "E:network_conn")?;
-    let v: Value = resp
-        .body_mut()
-        .read_json()
-        .map_err(|_| "E:op_failed")?;
+    let v: Value = resp.body_mut().read_json().map_err(|_| "E:op_failed")?;
     v["assets"]
         .as_array()
         .and_then(|a| {
@@ -210,7 +206,14 @@ fn verify_signature(path: &Path) -> bool {
         path.display()
     );
     let mut c = Command::new("powershell");
-    c.args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", &script]);
+    c.args([
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        &script,
+    ]);
     c.creation_flags(0x08000000);
     c.status().map(|s| s.success()).unwrap_or(false)
 }
@@ -228,7 +231,14 @@ fn run_installer_as_admin(exe: &Path, args: &[&str]) -> R<()> {
         args_str
     );
     let mut c = Command::new("powershell");
-    c.args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", &script]);
+    c.args([
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        &script,
+    ]);
     c.creation_flags(0x08000000);
     let st = c.status().map_err(|_| "E:op_failed")?;
     if st.success() {
@@ -241,7 +251,11 @@ fn run_installer_as_admin(exe: &Path, args: &[&str]) -> R<()> {
 #[allow(dead_code)]
 fn run_cmd(cmd: &mut Command) -> R<()> {
     let st = cmd.status().map_err(|_| "E:op_failed")?;
-    if st.success() { Ok(()) } else { Err("E:install_failed".into()) }
+    if st.success() {
+        Ok(())
+    } else {
+        Err("E:install_failed".into())
+    }
 }
 
 fn install_git(app: &AppHandle) -> R<()> {
@@ -283,7 +297,7 @@ fn install_git(app: &AppHandle) -> R<()> {
             if probe_git("git") {
                 clear_git_cache();
                 emit_progress(app, "git", "install", 100);
-        Ok(())
+                return Ok(());
             }
             std::thread::sleep(Duration::from_secs(2));
         }
@@ -316,8 +330,10 @@ fn install_git(app: &AppHandle) -> R<()> {
                     cc
                 };
                 emit_progress(app, "git", "install", 100);
-                let _ = run_cmd(&mut c);
-        clear_git_cache();
+                if run_cmd(&mut c).is_ok() {
+                    clear_git_cache();
+                    return Ok(());
+                }
             }
         }
         Err("E:install_failed".into())
@@ -356,7 +372,7 @@ fn install_lfs(app: &AppHandle) -> R<()> {
                 c2.args(["lfs", "install"]);
                 let _ = run_cmd(&mut c2);
             };
-        r
+            return r;
         }
         return Err("E:install_failed".into());
     }
@@ -387,7 +403,9 @@ fn install_lfs(app: &AppHandle) -> R<()> {
                     cc
                 };
                 emit_progress(app, "lfs", "install", 100);
-        let _ = run_cmd(&mut c);
+                if run_cmd(&mut c).is_ok() {
+                    return Ok(());
+                }
             }
         }
         Err("E:install_failed".into())
@@ -418,7 +436,7 @@ fn install_ollama(app: &AppHandle) -> R<()> {
             let mut c = Command::new("brew");
             c.args(["install", "ollama"]);
             emit_progress(app, "ollama", "install", 100);
-        run_cmd(&mut c)
+            return run_cmd(&mut c);
         }
         let mut c = Command::new("open");
         c.arg(OLLAMA_MAC_URL);
